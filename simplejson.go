@@ -89,51 +89,52 @@ func (j *Json) Set(key, value string) {
     }
 }
 
-func (j *Json) Map() (map[string]interface{}, error) {
-    if result, ok := (j.data).(map[string]interface{}); ok {
-        return result, nil
+func (j *Json) Map() (result map[string]interface{}, err error) {
+    result, ok := (j.data).(map[string]interface{})
+    if !ok {
+        err = errors.New("assert to map failed")
     }
-    
-    return nil, errors.New("assert to map failed")
+    return
 }
 
-func (j *Json) Array() ([]interface{}, error) {
-    if result, ok := (j.data).([]interface{}); ok {
-        return result, nil
+func (j *Json) Array() (result []interface{}, err error) {
+    result, ok := (j.data).([]interface{})
+    if !ok {
+        err = errors.New("assert to array failed")
     }
-    
-    return nil, errors.New("assert to array failed")
+    return
 }
 
-func (j *Json) Bool() (bool, error) {
-    if result, ok := (j.data).(bool); ok {
-        return result, nil
+func (j *Json) Bool() (result bool, err error) {
+    result, ok := (j.data).(bool)
+    if !ok {
+        err = errors.New("assert to bool failed")
     }
-    
-    return false, errors.New("assert to bool failed")
+    return
 }
 
-func (j *Json) String() (string, error) {
-    if result, ok := (j.data).(string); ok {
-        return result, nil
+func (j *Json) String() (result string, err error) {
+    result, ok := (j.data).(string)
+    if !ok {
+        err = errors.New("assert to string failed")
     }
-    
-    return "", errors.New("assert to string failed")
+    return
 }
 
-func (j *Json) Int() (int, error) {
-    if result, ok := (j.data).(float64); ok {
-        return int(result), nil
+func (j *Json) Int() (result int, err error) {
+    f, ok := (j.data).(float64)
+	result = int(f)
+    if !ok {
+        err = errors.New("assert to int failed")
     }
-    
-    return -1, errors.New("assert to float64 failed")
+    return
 }
 
-func (j *Json) Float() (float64, error) {
-    if result, ok := (j.data).(float64); ok {
-        return result, nil
+func (j *Json) Float() (result float64, err error) {
+    result, ok := (j.data).(float64)
+    if !ok {
+        err = errors.New("assert to float64 failed")
     }
-    
-    return -1, errors.New("assert to float64 failed")
+    return
 }
 
