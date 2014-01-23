@@ -6,7 +6,7 @@ simplejson.go is the simplest way to use JSON in go.
 
 ## Overview
 
-With .Load(s) .Dump(s) .Get .Set, that is all.
+With .Load(s) .Dump(s) .Exists .Get .Set, that is all.
 
 ## Installation
 
@@ -26,6 +26,12 @@ Example is in simplejson_test.go, you know it.
 
 So simple a package we don't need any documentation.
 
+## Thanks
+
+[Alex Warhawk](https://github.com/W4RH4WK)
+
+[John-Alan Simmons](https://github.com/jsimnz)
+
 ## License
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License. 
@@ -34,4 +40,4 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 
 simplejson.go was written by [Li Kexian](http://www.zhetenga.com/), a php programmer who don't know anything about golang.
 
-Follow me on [Twitter](http://www.twitter.com/likexian) or [T.QQ](http://t.qq.com/likexian).
+Follow me on [Twitter](http://www.twitter.com/likexian).
