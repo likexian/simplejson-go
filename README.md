@@ -35,4 +35,3 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 simplejson.go was written by [Li Kexian](http://www.zhetenga.com/), a php programmer who don't know anything about golang.
 
 Follow me on [Twitter](http://www.twitter.com/likexian) or [T.QQ](http://t.qq.com/likexian).
-
