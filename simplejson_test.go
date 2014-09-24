@@ -1,12 +1,61 @@
+/*
+ * Go module for JSON parser
+ * http://www.likexian.com/
+ *
+ * Copyright 2012-2014, Kexian Li
+ * Released under the Apache License, Version 2.0
+ *
+ */
+
 package simplejson
 
+
 import (
-    "github.com/bmizerany/assert"
     "testing"
+    "github.com/bmizerany/assert"
 )
 
+
+type JsonResult struct {
+    Result Result `json:"result"`
+    Status Status `json:"status"`
+}
+
+
+type Result struct {
+    List    []int64 `json:"list"`
+    Online  bool    `json:"online"`
+    Rate    float64 `json:"rate"`
+}
+
+
+type Status struct {
+    Code    int64  `json:"code"`
+    Message string `json:"message"`
+}
+
+
 func TestSimplejson(t *testing.T) {
-    data := `{"result":{"list":[0,1,2,3,4],"online":true,"rate":0.8},"status":{"code":1,"message":"success"}}`
+    data_result := Result{}
+    data_result.List = []int64{0, 1, 2, 3, 4}
+    data_result.Online = true
+    data_result.Rate = 0.8
+
+    data_status := Status{}
+    data_status.Code = 1
+    data_status.Message = "success"
+
+    data_json_result := JsonResult{}
+    data_json_result.Result = data_result
+    data_json_result.Status = data_status
+
+    data_json := Json{}
+    data_json.Data = data_json_result
+
+    data, err := Dumps(&data_json)
+    assert.Equal(t, nil, err)
+    assert.Equal(t, data, `{"result":{"list":[0,1,2,3,4],"online":true,"rate":0.8},"status":{"code":1,"message":"success"}}`)
+
     json, err := Loads(data)
     assert.NotEqual(t, nil, json)
     assert.Equal(t, nil, err)
@@ -41,11 +90,13 @@ func TestSimplejson(t *testing.T) {
     assert.Equal(t, data, result)
 
     json.Set("name", "Li Kexian")
+    json.Set("link", "http://www.likexian.com/")
     name, _ := json.Get("name").String()
     assert.Equal(t, "Li Kexian", name)
 
-    bytes := Dump("simplejson.json", json)
+    bytes, err := Dump("simplejson.json", json)
     assert.NotEqual(t, 0, bytes)
+    assert.Equal(t, nil, err)
 
     njson, err := Load("simplejson.json")
     assert.Equal(t, json, njson)

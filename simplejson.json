@@ -1,0 +1,19 @@
+{
+    "link": "http://www.likexian.com/",
+    "name": "Li Kexian",
+    "result": {
+        "list": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ],
+        "online": true,
+        "rate": 0.8
+    },
+    "status": {
+        "code": 1,
+        "message": "success"
+    }
+}
