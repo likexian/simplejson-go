@@ -58,7 +58,7 @@ func Dump(file string, data *Json) (bytes int, err error) {
         return
     }
 
-    fd, err := os.OpenFile(file, os.O_CREATE | os.O_WRONLY, 0644)
+    fd, err := os.OpenFile(file, os.O_CREATE | os.O_TRUNC | os.O_WRONLY, 0644)
     if err != nil {
         return
     }
