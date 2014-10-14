@@ -11,6 +11,7 @@ package simplejson
 
 
 import (
+    "fmt"
     "testing"
     "github.com/bmizerany/assert"
 )
@@ -62,28 +63,38 @@ func TestSimplejson(t *testing.T) {
 
     code, _ := json.Get("status").Get("code").Int()
     assert.Equal(t, 1, code)
+
     message, _ := json.Get("status").Get("message").String()
     assert.Equal(t, "success", message)
 
-    exists := json.Exists("result")
+    exists := json.Has("result")
     assert.Equal(t, true, exists)
 
-    nexists := json.Exists("doesn't-exist")
-    assert.Equal(t, false, nexists)
-
-    deepexists := json.Get("result").Exists("online")
+    deepexists := json.Get("result").Has("online")
     assert.Equal(t, true, deepexists)
 
-    online, _ := json.Get("result").Get("online").Bool()
-    assert.Equal(t, true, online)
-    rate, _ := json.Get("result").Get("rate").Float()
-    assert.Equal(t, 0.80, rate)
+    nexists := json.Has("not-exists")
+    assert.Equal(t, false, nexists)
+
+    json.Set("not-exists", "do-exists")
+    sexists := json.Has("not-exists")
+    assert.Equal(t, true, sexists)
+
+    json.Del("not-exists")
+    dexists := json.Has("not-exists")
+    assert.Equal(t, false, dexists)
 
     list, _ := json.Get("result").Get("list").Array()
     assert.NotEqual(t, nil, list)
     for k, v := range list {
         assert.Equal(t, k, int(v.(float64)))
     }
+
+    online, _ := json.Get("result").Get("online").Bool()
+    assert.Equal(t, true, online)
+
+    rate, _ := json.Get("result").Get("rate").Float64()
+    assert.Equal(t, 0.80, rate)
 
     result, err := Dumps(json)
     assert.Equal(t, nil, err)
@@ -101,4 +112,26 @@ func TestSimplejson(t *testing.T) {
     njson, err := Load("simplejson.json")
     assert.Equal(t, json, njson)
     assert.Equal(t, nil, err)
+
+    new_json := New()
+    new_json.Set("new", true)
+
+    new_exists := new_json.Has("new")
+    assert.Equal(t, true, new_exists)
+
+    new_value, _ := new_json.Get("new").Bool()
+    assert.Equal(t, true, new_value)
+
+    new_json.Set("int", 100)
+    int_value, _ := new_json.Get("int").Int()
+    assert.Equal(t, "int", fmt.Sprintf("%T", int_value))
+
+    uint_value, _ := new_json.Get("int").Uint()
+    assert.Equal(t, "uint", fmt.Sprintf("%T", uint_value))
+
+    int64_value, _ := new_json.Get("int").Int64()
+    assert.Equal(t, "int64", fmt.Sprintf("%T", int64_value))
+
+    uint64_value, _ := new_json.Get("int").Uint64()
+    assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_value))
 }

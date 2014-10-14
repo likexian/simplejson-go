@@ -11,11 +11,11 @@ package simplejson
 
 
 import (
-    "encoding/json"
-    "errors"
+    "os"
     "io"
     "io/ioutil"
-    "os"
+    "errors"
+    "encoding/json"
 )
 
 
@@ -25,7 +25,7 @@ type Json struct {
 
 
 func Version() string {
-    return "0.2.0"
+    return "0.3.0"
 }
 
 
@@ -36,6 +36,13 @@ func Author() string {
 
 func License() string {
     return "Apache License, Version 2.0"
+}
+
+
+func New() (*Json) {
+    return &Json {
+        Data: make(map[string]interface{}),
+    }
 }
 
 
@@ -99,7 +106,7 @@ func PrettyDumps(j *Json) (result string, err error) {
 }
 
 
-func (j *Json) Exists(key string) (bool) {
+func (j *Json) Has(key string) (bool) {
     result, err := j.Map()
     if err == nil {
         _, exists := result[key]
@@ -122,10 +129,18 @@ func (j *Json) Get(key string) (*Json) {
 }
 
 
-func (j *Json) Set(key, value string) {
+func (j *Json) Set(key string, value interface{}) {
     result, err := j.Map()
     if err == nil {
         result[key] = value
+    }
+}
+
+
+func (j *Json) Del(key string) {
+    result, err := j.Map()
+    if err == nil {
+        delete(result, key)
     }
 }
 
@@ -166,20 +181,54 @@ func (j *Json) String() (result string, err error) {
 }
 
 
-func (j *Json) Int() (result int, err error) {
-    f, ok := (j.Data).(float64)
-    result = int(f)
+func (j *Json) Float64() (result float64, err error) {
+    result, ok := (j.Data).(float64)
     if !ok {
-        err = errors.New("assert to int failed")
+        err = errors.New("assert to float64 failed")
     }
     return
 }
 
 
-func (j *Json) Float() (result float64, err error) {
-    result, ok := (j.Data).(float64)
+func (j *Json) Int() (result int, err error) {
+    f, ok := (j.Data).(float64)
     if !ok {
-        err = errors.New("assert to float64 failed")
+        err = errors.New("assert to int failed")
     }
+    result = int(f)
+
+    return
+}
+
+
+func (j *Json) Uint() (result uint, err error) {
+    f, ok := (j.Data).(float64)
+    if !ok {
+        err = errors.New("assert to uint failed")
+    }
+    result = uint(f)
+
+    return
+}
+
+
+func (j *Json) Int64() (result int64, err error) {
+    f, ok := (j.Data).(float64)
+    if !ok {
+        err = errors.New("assert to int64 failed")
+    }
+    result = int64(f)
+
+    return
+}
+
+
+func (j *Json) Uint64() (result uint64, err error) {
+    f, ok := (j.Data).(float64)
+    if !ok {
+        err = errors.New("assert to uint64 failed")
+    }
+    result = uint64(f)
+
     return
 }

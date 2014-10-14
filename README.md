@@ -20,6 +20,10 @@ This module provides the most friendly way to use JSON in golang.
 
 ## Documentation
 
+Get a new JSON
+
+    func New() (*Json)
+
 Load string to JSON
 
     func Loads(text string) (result *Json, err error)
@@ -42,7 +46,7 @@ Dump JSON to file
 
 Check key is in JSON
 
-    func (j *Json) Exists(key string) (bool)
+    func (j *Json) Has(key string) (bool)
 
 Get value from JSON
 
@@ -50,7 +54,7 @@ Get value from JSON
 
 Set value to JSON
 
-    func (j *Json) Set(key, value string)
+    func (j *Json) Set(key string, value interface{})
 
 Get the map value
 
@@ -68,13 +72,25 @@ Get the string value
 
     func (j *Json) String() (result string, err error)
 
+Get the float64 value
+
+    func (j *Json) Float64() (result float64, err error)
+
 Get the int value
 
     func (j *Json) Int() (result int, err error)
 
-Get the float value
+Get the uint value
 
-    func (j *Json) Float() (result float64, err error)
+    func (j *Json) Uint() (result uint, err error)
+
+Get the int64 value
+
+    func (j *Json) Int64() (result int64, err error)
+
+Get the uint64 value
+
+    func (j *Json) Uint64() (result uint64, err error)
 
 ## Example
 
