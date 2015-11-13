@@ -109,6 +109,11 @@ func TestSimplejson(t *testing.T) {
     assert.NotEqual(t, 0, bytes)
     assert.Equal(t, nil, err)
 
+    result, bytes2, err := DumpPretty("simplejson.json", json)
+    assert.NotEqual(t, 0,  bytes2)
+    assert.Equal(t, nil, err)
+    fmt.Print(result)
+
     njson, err := Load("simplejson.json")
     assert.Equal(t, json, njson)
     assert.Equal(t, nil, err)
