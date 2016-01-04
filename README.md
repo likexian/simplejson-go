@@ -112,14 +112,14 @@ Dump the struct data to JSON string
     data_json := simplejson.Json{}
     data_json.Data = data_status
     data, err := simplejson.Dumps(&data_json)
-    if err != nil {
+    if err == nil {
         fmt.Println(data)
     }
 
 Load the JSON string
 
     json, err := Loads(data)
-    if err != nil {
+    if err == nil {
         // Get the value of JSON
         fmt.Println(json.Get("Code").Int())
         fmt.Println(json.Get("Message").String())
