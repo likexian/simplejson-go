@@ -75,6 +75,22 @@ func Dump(file string, data *Json) (bytes int, err error) {
     return
 }
 
+func DumpPretty(file string, data *Json) (result string, bytes int, err error) {
+    pretty, err := PrettyDumps(data)
+    if err != nil {
+        return
+    }
+
+    fd, err := os.OpenFile(file, os.O_CREATE | os.O_TRUNC | os.O_WRONLY, 0644)
+    if err != nil {
+        return
+    }
+
+    bytes, err = io.WriteString(fd, pretty)
+
+    return pretty, bytes, err
+}
+
 
 func Loads(text string) (result *Json, err error) {
     result = new(Json)
@@ -104,7 +120,6 @@ func PrettyDumps(j *Json) (result string, err error) {
 
     return
 }
-
 
 func (j *Json) Has(key string) (bool) {
     result, err := j.Map()
