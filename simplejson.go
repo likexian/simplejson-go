@@ -71,6 +71,7 @@ func Dump(file string, data *Json) (bytes int, err error) {
     }
 
     bytes, err = io.WriteString(fd, result)
+    fd.Close()
 
     return
 }
