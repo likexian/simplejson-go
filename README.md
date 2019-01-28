@@ -127,16 +127,14 @@ Load the JSON string
 
 ## LICENSE
 
-Copyright 2012-2014, Kexian Li
+Copyright 2012-2019, Li Kexian
 
 Apache License, Version 2.0
 
 ## About
 
-- [Kexian Li](http://github.com/likexian)
-- [http://www.likexian.com/](http://www.likexian.com/)
+- [Li Kexian](https://www.likexian.com/)
 
-## Thanks
+## DONATE
 
-- [Alex Warhawk](https://github.com/W4RH4WK)
-- [John-Alan Simmons](https://github.com/jsimnz)
+- [Help me make perfect](https://www.likexian.com/donate/)

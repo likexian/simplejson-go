@@ -1,8 +1,8 @@
 /*
- * Go module for JSON parser
+ * Go module for JSON parse
  * http://www.likexian.com/
  *
- * Copyright 2012-2014, Kexian Li
+ * Copyright 2012-2019, Li Kexian
  * Released under the Apache License, Version 2.0
  *
  */
