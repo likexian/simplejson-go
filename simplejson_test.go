@@ -110,6 +110,29 @@ func TestSimplejson(t *testing.T) {
     assert.Equal(t, "float64", fmt.Sprintf("%T", rate))
     assert.Equal(t, 0.80, rate)
 
+    index_data, err := json_data.Get("result").Get("intlist").GetIndex(3).Int()
+    assert.Equal(t, nil, err)
+    assert.Equal(t, "int", fmt.Sprintf("%T", index_data))
+    assert.Equal(t, 3, index_data)
+
+    index_data, err = json_data.Get("result").Get("intlist").GetIndex(10).Int()
+    assert.NotEqual(t, nil, err)
+    assert.Equal(t, "int", fmt.Sprintf("%T", index_data))
+    assert.Equal(t, 0, index_data)
+
+    gets_data, err := json_data.Gets("status/code").Int()
+    assert.Equal(t, nil, err)
+    assert.Equal(t, "int", fmt.Sprintf("%T", gets_data))
+    assert.Equal(t, 1, gets_data)
+
+    gets_data, err = json_data.Gets("result/intlist/3").Int()
+    assert.Equal(t, nil, err)
+    assert.Equal(t, "int", fmt.Sprintf("%T", gets_data))
+    assert.Equal(t, 3, gets_data)
+
+    gets_data, err = json_data.Gets("status/not-exists").Int()
+    assert.NotEqual(t, nil, err)
+
     result, err := Dumps(json_data)
     assert.Equal(t, nil, err)
     assert.Equal(t, true, strings.Contains(result, `"strlist":["0","1","2","3","4"]`))

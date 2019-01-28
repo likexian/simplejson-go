@@ -18,6 +18,7 @@ import (
     "errors"
     "encoding/json"
     "reflect"
+    "strings"
     "strconv"
     "log"
 )
@@ -31,7 +32,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.6.0"
+    return "0.7.0"
 }
 
 
@@ -126,6 +127,15 @@ func PrettyDumps(j *Json) (result string, err error) {
 }
 
 
+// set key-value to json object
+func (j *Json) Set(key string, value interface{}) {
+    result, err := j.Map()
+    if err == nil {
+        result[key] = value
+    }
+}
+
+
 // check json object has key
 func (j *Json) Has(key string) (bool) {
     result, err := j.Map()
@@ -138,7 +148,17 @@ func (j *Json) Has(key string) (bool) {
 }
 
 
-// get value from json object by key
+// delete key-value from json object
+func (j *Json) Del(key string) {
+    result, err := j.Map()
+    if err == nil {
+        delete(result, key)
+    }
+}
+
+
+// returns the pointer to json object by key
+//   json.Get("status").Get("code").Int()
 func (j *Json) Get(key string) (*Json) {
     result, err := j.Map()
     if err == nil {
@@ -151,21 +171,41 @@ func (j *Json) Get(key string) (*Json) {
 }
 
 
-// set key-value to json object
-func (j *Json) Set(key string, value interface{}) {
-    result, err := j.Map()
-    if err == nil {
-        result[key] = value
+// returns a pointer to the path of json object
+//   json.Gets("status/code").Int()
+//   json.Gets("result/intlist/3").Int()
+func (j *Json)Gets(key string) (*Json) {
+    result := j
+
+    for _, v := range strings.Split(key, "/") {
+        v = strings.TrimSpace(v)
+        if v != "" {
+            if result.Has(v) {
+                result = result.Get(v)
+            } else {
+                i, err := strconv.Atoi(v)
+                if err == nil {
+                    result = result.GetIndex(i)
+                }
+            }
+        }
     }
+
+    return result
 }
 
 
-// delete key-value from json object
-func (j *Json) Del(key string) {
-    result, err := j.Map()
+// returns a pointer to the index of json object
+//   json.Get("int_list").GetIndex(1).Int()
+func (j *Json)GetIndex(i int) (*Json) {
+    data, err := j.Array()
     if err == nil {
-        delete(result, key)
+        if len(data) > i {
+            return &Json{data[i]}
+        }
     }
+
+    return &Json{nil}
 }
 
 
@@ -179,7 +219,7 @@ func (j *Json) Map() (result map[string]interface{}, err error) {
 }
 
 
-// return as array from json object
+// returns as array from json object
 func (j *Json) Array() (result []interface{}, err error) {
     result, ok := (j.Data).([]interface{})
     if !ok {
