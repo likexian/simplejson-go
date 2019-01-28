@@ -1,6 +1,6 @@
 /*
  * Go module for JSON parsing
- * http://www.likexian.com/
+ * https://www.likexian.com/
  *
  * Copyright 2012-2019, Li Kexian
  * Released under the Apache License, Version 2.0
@@ -14,8 +14,12 @@ import (
     "os"
     "io"
     "io/ioutil"
+    "bytes"
     "errors"
     "encoding/json"
+    "reflect"
+    "strconv"
+    "log"
 )
 
 
@@ -27,7 +31,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.3.0"
+    return "0.5.0"
 }
 
 
@@ -87,7 +91,10 @@ func Dump(file string, data *Json) (bytes int, err error) {
 // unmarshal json from string, returns json object
 func Loads(text string) (result *Json, err error) {
     result = new(Json)
-    err = json.Unmarshal([]byte(text), &result.Data)
+
+    dec := json.NewDecoder(bytes.NewBuffer([]byte(text)))
+    dec.UseNumber()
+    err = dec.Decode(&result.Data)
 
     return
 }
@@ -99,6 +106,7 @@ func Dumps(j *Json) (result string, err error) {
     if err != nil {
         return
     }
+
     result = string(data)
 
     return
@@ -111,6 +119,7 @@ func PrettyDumps(j *Json) (result string, err error) {
     if err != nil {
         return
     }
+
     result = string(data)
 
     return
@@ -202,57 +211,194 @@ func (j *Json) String() (result string, err error) {
 
 // returns as float64 from json object
 func (j *Json) Float64() (result float64, err error) {
-    result, ok := (j.Data).(float64)
-    if !ok {
-        err = errors.New("assert to float64 failed")
+    switch j.Data.(type) {
+        case json.Number:
+            return j.Data.(json.Number).Float64()
+        case float32, float64:
+            return reflect.ValueOf(j.Data).Float(), nil
+        case int, int8, int16, int32, int64:
+            return float64(reflect.ValueOf(j.Data).Int()), nil
+        case uint, uint8, uint16, uint32, uint64:
+            return float64(reflect.ValueOf(j.Data).Uint()), nil
+        default:
+            return 0, errors.New("invalid value type")
     }
-    return
 }
 
 
 // returns as int from json object
 func (j *Json) Int() (result int, err error) {
-    f, ok := (j.Data).(float64)
-    if !ok {
-        err = errors.New("assert to int failed")
+    switch j.Data.(type) {
+        case json.Number:
+            r, err := j.Data.(json.Number).Int64()
+            return int(r), err
+        case float32, float64:
+            return int(reflect.ValueOf(j.Data).Float()), nil
+        case int, int8, int16, int32, int64:
+            return int(reflect.ValueOf(j.Data).Int()), nil
+        case uint, uint8, uint16, uint32, uint64:
+            return int(reflect.ValueOf(j.Data).Uint()), nil
+        default:
+            return 0, errors.New("invalid value type")
     }
-    result = int(f)
-
-    return
-}
-
-
-// returns as uint from json object
-func (j *Json) Uint() (result uint, err error) {
-    f, ok := (j.Data).(float64)
-    if !ok {
-        err = errors.New("assert to uint failed")
-    }
-    result = uint(f)
-
-    return
 }
 
 
 // returns as int64 from json object
 func (j *Json) Int64() (result int64, err error) {
-    f, ok := (j.Data).(float64)
-    if !ok {
-        err = errors.New("assert to int64 failed")
+    switch j.Data.(type) {
+        case json.Number:
+            return j.Data.(json.Number).Int64()
+        case float32, float64:
+            return int64(reflect.ValueOf(j.Data).Float()), nil
+        case int, int8, int16, int32, int64:
+            return reflect.ValueOf(j.Data).Int(), nil
+        case uint, uint8, uint16, uint32, uint64:
+            return int64(reflect.ValueOf(j.Data).Uint()), nil
+        default:
+            return 0, errors.New("invalid value type")
     }
-    result = int64(f)
-
-    return
 }
 
 
 // returns as uint64 from json object
 func (j *Json) Uint64() (result uint64, err error) {
-    f, ok := (j.Data).(float64)
-    if !ok {
-        err = errors.New("assert to uint64 failed")
+    switch j.Data.(type) {
+        case json.Number:
+            return strconv.ParseUint(j.Data.(json.Number).String(), 10, 64)
+        case float32, float64:
+            return uint64(reflect.ValueOf(j.Data).Float()), nil
+        case int, int8, int16, int32, int64:
+            return uint64(reflect.ValueOf(j.Data).Int()), nil
+        case uint, uint8, uint16, uint32, uint64:
+            return reflect.ValueOf(j.Data).Uint(), nil
+        default:
+            return 0, errors.New("invalid value type")
     }
-    result = uint64(f)
+}
 
-    return
+
+// returns as bool from json object with optional default value
+func (j *Json) MustBool(args ...bool) (bool) {
+    var def bool
+
+    switch len(args) {
+        case 0:
+        case 1:
+            def = args[0]
+        default:
+            log.Panicf("MustBool received too many arguments %d > 1", len(args))
+    }
+
+    r, err := j.Bool()
+    if err == nil {
+        return r
+    }
+
+    return def
+}
+
+
+// returns as string from json object with optional default value
+func (j *Json) MustString(args ...string) (string) {
+    var def string
+
+    switch len(args) {
+        case 0:
+        case 1:
+            def = args[0]
+        default:
+            log.Panicf("MustString received too many arguments %d > 1", len(args))
+    }
+
+    r, err := j.String()
+    if err == nil {
+        return r
+    }
+
+    return def
+}
+
+
+// returns as float64 from json object with optional default value
+func (j *Json) MustFloat64(args ...float64) (float64) {
+    var def float64
+
+    switch len(args) {
+        case 0:
+        case 1:
+            def = args[0]
+        default:
+            log.Panicf("MustFloat64 received too many arguments %d > 1", len(args))
+    }
+
+    r, err := j.Float64()
+    if err == nil {
+        return r
+    }
+
+    return def
+}
+
+
+// returns as int from json object with optional default value
+func (j *Json) MustInt(args ...int) (int) {
+    var def int
+
+    switch len(args) {
+        case 0:
+        case 1:
+            def = args[0]
+        default:
+            log.Panicf("MustInt received too many arguments %d > 1", len(args))
+    }
+
+    r, err := j.Int()
+    if err == nil {
+        return r
+    }
+
+    return def
+}
+
+
+// returns as int64 from json object with optional default value
+func (j *Json) MustInt64(args ...int64) (int64) {
+    var def int64
+
+    switch len(args) {
+        case 0:
+        case 1:
+            def = args[0]
+        default:
+            log.Panicf("MustInt64 received too many arguments %d > 1", len(args))
+    }
+
+    r, err := j.Int64()
+    if err == nil {
+        return r
+    }
+
+    return def
+}
+
+
+// returns as uint64 from json object with optional default value
+func (j *Json) MustUint64(args ...uint64) (uint64) {
+    var def uint64
+
+    switch len(args) {
+        case 0:
+        case 1:
+            def = args[0]
+        default:
+            log.Panicf("MustUint64 received too many arguments %d > 1", len(args))
+    }
+
+    r, err := j.Uint64()
+    if err == nil {
+        return r
+    }
+
+    return def
 }

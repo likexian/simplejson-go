@@ -1,6 +1,6 @@
 /*
  * Go module for JSON parsing
- * http://www.likexian.com/
+ * https://www.likexian.com/
  *
  * Copyright 2012-2019, Li Kexian
  * Released under the Apache License, Version 2.0
@@ -12,6 +12,7 @@ package simplejson
 
 import (
     "fmt"
+    "encoding/json"
     "testing"
     "github.com/bmizerany/assert"
 )
@@ -57,60 +58,64 @@ func TestSimplejson(t *testing.T) {
     assert.Equal(t, nil, err)
     assert.Equal(t, data, `{"result":{"list":[0,1,2,3,4],"online":true,"rate":0.8},"status":{"code":1,"message":"success"}}`)
 
-    json, err := Loads(data)
-    assert.NotEqual(t, nil, json)
+    json_data, err := Loads(data)
+    assert.NotEqual(t, nil, json_data)
     assert.Equal(t, nil, err)
 
-    code, _ := json.Get("status").Get("code").Int()
+    code, _ := json_data.Get("status").Get("code").Int()
+    assert.Equal(t, "int", fmt.Sprintf("%T", code))
     assert.Equal(t, 1, code)
 
-    message, _ := json.Get("status").Get("message").String()
+    message, _ := json_data.Get("status").Get("message").String()
+    assert.Equal(t, "string", fmt.Sprintf("%T", message))
     assert.Equal(t, "success", message)
 
-    exists := json.Has("result")
+    exists := json_data.Has("result")
     assert.Equal(t, true, exists)
 
-    deepexists := json.Get("result").Has("online")
+    deepexists := json_data.Get("result").Has("online")
     assert.Equal(t, true, deepexists)
 
-    nexists := json.Has("not-exists")
+    nexists := json_data.Has("not-exists")
     assert.Equal(t, false, nexists)
 
-    json.Set("not-exists", "do-exists")
-    sexists := json.Has("not-exists")
+    json_data.Set("not-exists", "do-exists")
+    sexists := json_data.Has("not-exists")
     assert.Equal(t, true, sexists)
 
-    json.Del("not-exists")
-    dexists := json.Has("not-exists")
+    json_data.Del("not-exists")
+    dexists := json_data.Has("not-exists")
     assert.Equal(t, false, dexists)
 
-    list, _ := json.Get("result").Get("list").Array()
+    list, _ := json_data.Get("result").Get("list").Array()
     assert.NotEqual(t, nil, list)
     for k, v := range list {
-        assert.Equal(t, k, int(v.(float64)))
+        r, _ := v.(json.Number).Int64()
+        assert.Equal(t, k, int(r))
     }
 
-    online, _ := json.Get("result").Get("online").Bool()
+    online, _ := json_data.Get("result").Get("online").Bool()
     assert.Equal(t, true, online)
 
-    rate, _ := json.Get("result").Get("rate").Float64()
+    rate, _ := json_data.Get("result").Get("rate").Float64()
+    assert.Equal(t, "float64", fmt.Sprintf("%T", rate))
     assert.Equal(t, 0.80, rate)
 
-    result, err := Dumps(json)
+    result, err := Dumps(json_data)
     assert.Equal(t, nil, err)
     assert.Equal(t, data, result)
 
-    json.Set("name", "Li Kexian")
-    json.Set("link", "https://www.likexian.com/")
-    name, _ := json.Get("name").String()
+    json_data.Set("name", "Li Kexian")
+    json_data.Set("link", "https://www.likexian.com/")
+    name, _ := json_data.Get("name").String()
     assert.Equal(t, "Li Kexian", name)
 
-    bytes, err := Dump("simplejson.json", json)
+    bytes, err := Dump("simplejson.json", json_data)
     assert.NotEqual(t, 0, bytes)
     assert.Equal(t, nil, err)
 
     njson, err := Load("simplejson.json")
-    assert.Equal(t, json, njson)
+    assert.Equal(t, json_data, njson)
     assert.Equal(t, nil, err)
 
     new_json := New()
@@ -120,18 +125,84 @@ func TestSimplejson(t *testing.T) {
     assert.Equal(t, true, new_exists)
 
     new_value, _ := new_json.Get("new").Bool()
+    assert.Equal(t, "bool", fmt.Sprintf("%T", new_value))
     assert.Equal(t, true, new_value)
 
     new_json.Set("int", 100)
     int_value, _ := new_json.Get("int").Int()
     assert.Equal(t, "int", fmt.Sprintf("%T", int_value))
+    assert.Equal(t, 100, int_value)
 
-    uint_value, _ := new_json.Get("int").Uint()
-    assert.Equal(t, "uint", fmt.Sprintf("%T", uint_value))
-
-    int64_value, _ := new_json.Get("int").Int64()
+    new_json.Set("int64", int64(100))
+    int64_value, _ := new_json.Get("int64").Int64()
     assert.Equal(t, "int64", fmt.Sprintf("%T", int64_value))
+    assert.Equal(t, int64(100), int64_value)
 
-    uint64_value, _ := new_json.Get("int").Uint64()
+    new_json.Set("uint64", uint64(100))
+    uint64_value, _ := new_json.Get("uint64").Uint64()
     assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_value))
+    assert.Equal(t, uint64(100), uint64_value)
+
+    new_value = new_json.Get("new").MustBool()
+    assert.Equal(t, true, new_value)
+
+    new_value = new_json.Get("not-exists").MustBool()
+    assert.Equal(t, false, new_value)
+
+    new_value = new_json.Get("not-exists").MustBool(true)
+    assert.Equal(t, true, new_value)
+
+    name = json_data.Get("name").MustString()
+    assert.Equal(t, "Li Kexian", name)
+
+    name = json_data.Get("not-exists").MustString()
+    assert.Equal(t, "", name)
+
+    name = json_data.Get("not-exists").MustString("default")
+    assert.Equal(t, "default", name)
+
+    rate = json_data.Get("result").Get("rate").MustFloat64()
+    assert.Equal(t, 0.80, rate)
+
+    rate = json_data.Get("result").Get("not-exists").MustFloat64()
+    assert.Equal(t, 0.00, rate)
+
+    rate = json_data.Get("result").Get("not-exists").MustFloat64(0.10)
+    assert.Equal(t, 0.10, rate)
+
+    int_value = new_json.Get("int").MustInt()
+    assert.Equal(t, "int", fmt.Sprintf("%T", int_value))
+    assert.Equal(t, 100, int_value)
+
+    int_value = new_json.Get("not-exists").MustInt()
+    assert.Equal(t, "int", fmt.Sprintf("%T", int_value))
+    assert.Equal(t, 0, int_value)
+
+    int_value = new_json.Get("not-exists").MustInt(1)
+    assert.Equal(t, "int", fmt.Sprintf("%T", int_value))
+    assert.Equal(t, 1, int_value)
+
+    int64_value = new_json.Get("int64").MustInt64()
+    assert.Equal(t, "int64", fmt.Sprintf("%T", int64_value))
+    assert.Equal(t, int64(100), int64_value)
+
+    int64_value = new_json.Get("not-exists").MustInt64()
+    assert.Equal(t, "int64", fmt.Sprintf("%T", int64_value))
+    assert.Equal(t, int64(0), int64_value)
+
+    int64_value = new_json.Get("not-exists").MustInt64(int64(1))
+    assert.Equal(t, "int64", fmt.Sprintf("%T", int64_value))
+    assert.Equal(t, int64(1), int64_value)
+
+    uint64_value = new_json.Get("uint64").MustUint64()
+    assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_value))
+    assert.Equal(t, uint64(100), uint64_value)
+
+    uint64_value = new_json.Get("not-exists").MustUint64()
+    assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_value))
+    assert.Equal(t, uint64(0), uint64_value)
+
+    uint64_value = new_json.Get("not-exists").MustUint64(uint64(1))
+    assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_value))
+    assert.Equal(t, uint64(1), uint64_value)
 }

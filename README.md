@@ -3,6 +3,7 @@
 simplejson-go is a simple Go module for JSON parsing.
 
 [![Build Status](https://secure.travis-ci.org/likexian/simplejson-go.png)](https://secure.travis-ci.org/likexian/simplejson-go)
+[![GoDoc](https://godoc.org/github.com/likexian/simplejson-go?status.svg)](https://godoc.org/github.com/likexian/simplejson-go)
 
 ## Overview
 
