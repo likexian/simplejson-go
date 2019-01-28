@@ -12,6 +12,7 @@ package simplejson
 
 import (
     "fmt"
+    "strings"
     "encoding/json"
     "testing"
     "github.com/bmizerany/assert"
@@ -25,9 +26,10 @@ type JsonResult struct {
 
 
 type Result struct {
-    List    []int64 `json:"list"`
-    Online  bool    `json:"online"`
-    Rate    float64 `json:"rate"`
+    IntList     []int64     `json:"intlist"`
+    StrList     []string    `json:"strlist"`
+    Online      bool        `json:"online"`
+    Rate        float64     `json:"rate"`
 }
 
 
@@ -39,7 +41,8 @@ type Status struct {
 
 func TestSimplejson(t *testing.T) {
     data_result := Result{}
-    data_result.List = []int64{0, 1, 2, 3, 4}
+    data_result.IntList = []int64{0, 1, 2, 3, 4}
+    data_result.StrList = []string{"0", "1", "2", "3", "4"}
     data_result.Online = true
     data_result.Rate = 0.8
 
@@ -56,7 +59,7 @@ func TestSimplejson(t *testing.T) {
 
     data, err := Dumps(&data_json)
     assert.Equal(t, nil, err)
-    assert.Equal(t, data, `{"result":{"list":[0,1,2,3,4],"online":true,"rate":0.8},"status":{"code":1,"message":"success"}}`)
+    assert.Equal(t, data, `{"result":{"intlist":[0,1,2,3,4],"strlist":["0","1","2","3","4"],"online":true,"rate":0.8},"status":{"code":1,"message":"success"}}`)
 
     json_data, err := Loads(data)
     assert.NotEqual(t, nil, json_data)
@@ -87,11 +90,17 @@ func TestSimplejson(t *testing.T) {
     dexists := json_data.Has("not-exists")
     assert.Equal(t, false, dexists)
 
-    list, _ := json_data.Get("result").Get("list").Array()
-    assert.NotEqual(t, nil, list)
-    for k, v := range list {
+    intlist, _ := json_data.Get("result").Get("intlist").Array()
+    assert.NotEqual(t, nil, intlist)
+    for k, v := range intlist {
         r, _ := v.(json.Number).Int64()
         assert.Equal(t, k, int(r))
+    }
+
+    strlist, _ := json_data.Get("result").Get("strlist").StringArray()
+    assert.NotEqual(t, nil, strlist)
+    for k, v := range strlist {
+        assert.Equal(t, v, fmt.Sprintf("%d", k))
     }
 
     online, _ := json_data.Get("result").Get("online").Bool()
@@ -103,7 +112,8 @@ func TestSimplejson(t *testing.T) {
 
     result, err := Dumps(json_data)
     assert.Equal(t, nil, err)
-    assert.Equal(t, data, result)
+    assert.Equal(t, true, strings.Contains(result, `"strlist":["0","1","2","3","4"]`))
+    assert.Equal(t, true, strings.Contains(result, `"intlist":[0,1,2,3,4]`))
 
     json_data.Set("name", "Li Kexian")
     json_data.Set("link", "https://www.likexian.com/")
@@ -160,6 +170,15 @@ func TestSimplejson(t *testing.T) {
 
     name = json_data.Get("not-exists").MustString("default")
     assert.Equal(t, "default", name)
+
+    strlist = json_data.Get("result").Get("strlist").MustStringArray()
+    assert.Equal(t, []string{"0","1","2","3","4"}, strlist)
+
+    strlist = json_data.Get("result").Get("not-exists").MustStringArray()
+    assert.Equal(t, 0, len(strlist))
+
+    strlist = json_data.Get("result").Get("not-exists").MustStringArray([]string{"default"})
+    assert.Equal(t, []string{"default"}, strlist)
 
     rate = json_data.Get("result").Get("rate").MustFloat64()
     assert.Equal(t, 0.80, rate)

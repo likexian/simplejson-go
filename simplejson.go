@@ -31,7 +31,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.5.0"
+    return "0.6.0"
 }
 
 
@@ -209,6 +209,30 @@ func (j *Json) String() (result string, err error) {
 }
 
 
+// returns as string array from json object
+func (j *Json) StringArray() (result []string, err error) {
+    data, err := j.Array()
+    if err != nil {
+        return
+    }
+
+    for _, v := range data {
+        if v == nil {
+            result = append(result, "")
+        } else {
+            r, ok := v.(string)
+            if !ok {
+                err = errors.New("assert to []string failed")
+                return
+            }
+            result = append(result, r)
+        }
+    }
+
+    return
+}
+
+
 // returns as float64 from json object
 func (j *Json) Float64() (result float64, err error) {
     switch j.Data.(type) {
@@ -312,6 +336,27 @@ func (j *Json) MustString(args ...string) (string) {
     }
 
     r, err := j.String()
+    if err == nil {
+        return r
+    }
+
+    return def
+}
+
+
+// returns as string from json object with optional default value
+func (j *Json) MustStringArray(args ...[]string) ([]string) {
+    var def []string
+
+    switch len(args) {
+        case 0:
+        case 1:
+            def = args[0]
+        default:
+            log.Panicf("MustStringArray received too many arguments %d > 1", len(args))
+    }
+
+    r, err := j.StringArray()
     if err == nil {
         return r
     }

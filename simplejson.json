@@ -2,7 +2,7 @@
     "link": "https://www.likexian.com/",
     "name": "Li Kexian",
     "result": {
-        "list": [
+        "intlist": [
             0,
             1,
             2,
@@ -10,7 +10,14 @@
             4
         ],
         "online": true,
-        "rate": 0.8
+        "rate": 0.8,
+        "strlist": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+        ]
     },
     "status": {
         "code": 1,
