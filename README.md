@@ -1,6 +1,6 @@
 # simplejson.go
 
-simplejson-go is a simple Go module for JSON parser.
+simplejson-go is a simple Go module for JSON parsing.
 
 [![Build Status](https://secure.travis-ci.org/likexian/simplejson-go.png)](https://secure.travis-ci.org/likexian/simplejson-go)
 
@@ -20,77 +20,7 @@ This module provides the most friendly way to use JSON in golang.
 
 ## Documentation
 
-Get a new JSON
-
-    func New() (*Json)
-
-Load string to JSON
-
-    func Loads(text string) (result *Json, err error)
-
-Dump JSON to string
-
-    func Dumps(j *Json) (result string, err error)
-
-Dump JSON to string with pretty format
-
-    func PrettyDumps(j *Json) (result string, err error)
-
-Load file to JSON
-
-    func Load(file string) (result *Json, err error)
-
-Dump JSON to file
-
-    func Dump(file string, data *Json) (bytes int, err error)
-
-Check key is in JSON
-
-    func (j *Json) Has(key string) (bool)
-
-Get value from JSON
-
-    func (j *Json) Get(key string) (*Json)
-
-Set value to JSON
-
-    func (j *Json) Set(key string, value interface{})
-
-Get the map value
-
-    func (j *Json) Map() (result map[string]interface{}, err error)
-
-Get the array value
-
-    func (j *Json) Array() (result []interface{}, err error)
-
-Get the bool value
-
-    func (j *Json) Bool() (result bool, err error)
-
-Get the string value
-
-    func (j *Json) String() (result string, err error)
-
-Get the float64 value
-
-    func (j *Json) Float64() (result float64, err error)
-
-Get the int value
-
-    func (j *Json) Int() (result int, err error)
-
-Get the uint value
-
-    func (j *Json) Uint() (result uint, err error)
-
-Get the int64 value
-
-    func (j *Json) Int64() (result int64, err error)
-
-Get the uint64 value
-
-    func (j *Json) Uint64() (result uint64, err error)
+Visit the docs on [GoDoc](https://godoc.org/github.com/likexian/simplejson-go)
 
 ## Example
 
@@ -118,7 +48,7 @@ Dump the struct data to JSON string
 
 Load the JSON string
 
-    json, err := Loads(data)
+    json, err := Loads(text)
     if err == nil {
         // Get the value of JSON
         fmt.Println(json.Get("Code").Int())

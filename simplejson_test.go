@@ -1,5 +1,5 @@
 /*
- * Go module for JSON parse
+ * Go module for JSON parsing
  * http://www.likexian.com/
  *
  * Copyright 2012-2019, Li Kexian

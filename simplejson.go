@@ -1,5 +1,5 @@
 /*
- * Go module for JSON parse
+ * Go module for JSON parsing
  * http://www.likexian.com/
  *
  * Copyright 2012-2019, Li Kexian
@@ -19,26 +19,31 @@ import (
 )
 
 
+// storing json data
 type Json struct {
     Data interface{}
 }
 
 
+// returns package version
 func Version() string {
     return "0.3.0"
 }
 
 
+// returns package author
 func Author() string {
-    return "[Li Kexian](http://www.likexian.com/)"
+    return "[Li Kexian](https://www.likexian.com/)"
 }
 
 
+// returns package license
 func License() string {
     return "Apache License, Version 2.0"
 }
 
 
+// returns a pointer to a new Json object
 func New() (*Json) {
     return &Json {
         Data: make(map[string]interface{}),
@@ -46,6 +51,7 @@ func New() (*Json) {
 }
 
 
+// loads data from a file, returns a json object
 func Load(file string) (result *Json, err error) {
     data, err := ioutil.ReadFile(file)
     if err != nil {
@@ -59,6 +65,7 @@ func Load(file string) (result *Json, err error) {
 }
 
 
+// dumps json object to a file
 func Dump(file string, data *Json) (bytes int, err error) {
     result, err := PrettyDumps(data)
     if err != nil {
@@ -77,6 +84,7 @@ func Dump(file string, data *Json) (bytes int, err error) {
 }
 
 
+// unmarshal json from string, returns json object
 func Loads(text string) (result *Json, err error) {
     result = new(Json)
     err = json.Unmarshal([]byte(text), &result.Data)
@@ -85,6 +93,7 @@ func Loads(text string) (result *Json, err error) {
 }
 
 
+// marshal json object to string
 func Dumps(j *Json) (result string, err error) {
     data, err := json.Marshal(&j.Data)
     if err != nil {
@@ -96,6 +105,7 @@ func Dumps(j *Json) (result string, err error) {
 }
 
 
+// marshal json object to string, with identation
 func PrettyDumps(j *Json) (result string, err error) {
     data, err := json.MarshalIndent(&j.Data, "", "    ")
     if err != nil {
@@ -107,6 +117,7 @@ func PrettyDumps(j *Json) (result string, err error) {
 }
 
 
+// check json object has key
 func (j *Json) Has(key string) (bool) {
     result, err := j.Map()
     if err == nil {
@@ -118,6 +129,7 @@ func (j *Json) Has(key string) (bool) {
 }
 
 
+// get value from json object by key
 func (j *Json) Get(key string) (*Json) {
     result, err := j.Map()
     if err == nil {
@@ -130,6 +142,7 @@ func (j *Json) Get(key string) (*Json) {
 }
 
 
+// set key-value to json object
 func (j *Json) Set(key string, value interface{}) {
     result, err := j.Map()
     if err == nil {
@@ -138,6 +151,7 @@ func (j *Json) Set(key string, value interface{}) {
 }
 
 
+// delete key-value from json object
 func (j *Json) Del(key string) {
     result, err := j.Map()
     if err == nil {
@@ -146,6 +160,7 @@ func (j *Json) Del(key string) {
 }
 
 
+// returns as map from json object
 func (j *Json) Map() (result map[string]interface{}, err error) {
     result, ok := (j.Data).(map[string]interface{})
     if !ok {
@@ -155,6 +170,7 @@ func (j *Json) Map() (result map[string]interface{}, err error) {
 }
 
 
+// return as array from json object
 func (j *Json) Array() (result []interface{}, err error) {
     result, ok := (j.Data).([]interface{})
     if !ok {
@@ -164,6 +180,7 @@ func (j *Json) Array() (result []interface{}, err error) {
 }
 
 
+// returns as bool from json object
 func (j *Json) Bool() (result bool, err error) {
     result, ok := (j.Data).(bool)
     if !ok {
@@ -173,6 +190,7 @@ func (j *Json) Bool() (result bool, err error) {
 }
 
 
+// returns as string from json object
 func (j *Json) String() (result string, err error) {
     result, ok := (j.Data).(string)
     if !ok {
@@ -182,6 +200,7 @@ func (j *Json) String() (result string, err error) {
 }
 
 
+// returns as float64 from json object
 func (j *Json) Float64() (result float64, err error) {
     result, ok := (j.Data).(float64)
     if !ok {
@@ -191,6 +210,7 @@ func (j *Json) Float64() (result float64, err error) {
 }
 
 
+// returns as int from json object
 func (j *Json) Int() (result int, err error) {
     f, ok := (j.Data).(float64)
     if !ok {
@@ -202,6 +222,7 @@ func (j *Json) Int() (result int, err error) {
 }
 
 
+// returns as uint from json object
 func (j *Json) Uint() (result uint, err error) {
     f, ok := (j.Data).(float64)
     if !ok {
@@ -213,6 +234,7 @@ func (j *Json) Uint() (result uint, err error) {
 }
 
 
+// returns as int64 from json object
 func (j *Json) Int64() (result int64, err error) {
     f, ok := (j.Data).(float64)
     if !ok {
@@ -224,6 +246,7 @@ func (j *Json) Int64() (result int64, err error) {
 }
 
 
+// returns as uint64 from json object
 func (j *Json) Uint64() (result uint64, err error) {
     f, ok := (j.Data).(float64)
     if !ok {
