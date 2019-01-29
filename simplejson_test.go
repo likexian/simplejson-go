@@ -151,6 +151,12 @@ func TestSimplejson(t *testing.T) {
     assert.Equal(t, json_data, njson)
     assert.Equal(t, nil, err)
 
+    json_data.Sets("status/error/code", 666)
+    gets_data, err = json_data.Gets("status/error/code").Int()
+    assert.Equal(t, nil, err)
+    assert.Equal(t, "int", fmt.Sprintf("%T", gets_data))
+    assert.Equal(t, 666, gets_data)
+
     new_json := New()
     new_json.Set("new", true)
 

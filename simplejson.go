@@ -136,6 +136,37 @@ func (j *Json) Set(key string, value interface{}) {
 }
 
 
+// set key-value to json object by key path
+//   json.Sets("status/code", 1)
+//   json.Sets("result/intlist/3", 666)
+func (j *Json) Sets(key string, value interface{}) {
+    key = strings.TrimSpace(key)
+    if key == "" {
+        j.Data = value
+        return
+    }
+
+    if _, ok := (j.Data).(map[string]interface{}); !ok {
+        j.Data = make(map[string]interface{})
+    }
+
+    keys := strings.Split(key, "/")
+    result := j.Data.(map[string]interface{})
+
+    for i:=0; i<len(keys)-1; i++  {
+        v := strings.TrimSpace(keys[i])
+        if v != "" {
+            if _, ok := result[v]; !ok {
+                result[v] = make(map[string]interface{})
+            }
+            result = result[v].(map[string]interface{})
+        }
+    }
+
+    result[keys[len(keys) - 1]] = value
+}
+
+
 // check json object has key
 func (j *Json) Has(key string) (bool) {
     result, err := j.Map()
@@ -174,7 +205,7 @@ func (j *Json) Get(key string) (*Json) {
 // returns a pointer to the path of json object
 //   json.Gets("status/code").Int()
 //   json.Gets("result/intlist/3").Int()
-func (j *Json)Gets(key string) (*Json) {
+func (j *Json) Gets(key string) (*Json) {
     result := j
 
     for _, v := range strings.Split(key, "/") {
@@ -197,7 +228,7 @@ func (j *Json)Gets(key string) (*Json) {
 
 // returns a pointer to the index of json object
 //   json.Get("int_list").GetIndex(1).Int()
-func (j *Json)GetIndex(i int) (*Json) {
+func (j *Json) GetIndex(i int) (*Json) {
     data, err := j.Array()
     if err == nil {
         if len(data) > i {
