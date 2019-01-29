@@ -32,7 +32,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.7.0"
+    return "0.8.0"
 }
 
 
@@ -127,32 +127,23 @@ func PrettyDumps(j *Json) (result string, err error) {
 }
 
 
-// set key-value to json object
+// set key-value to json object, dot(.) separated key is supported
+//   json.Set("status", 1)
+//   json.Set("status.code", 1)
+//   json.Set("result.intlist.3", 666)
 func (j *Json) Set(key string, value interface{}) {
-    result, err := j.Map()
-    if err == nil {
-        result[key] = value
-    }
-}
-
-
-// set key-value to json object by key path
-//   json.Sets("status/code", 1)
-//   json.Sets("result/intlist/3", 666)
-func (j *Json) Sets(key string, value interface{}) {
     key = strings.TrimSpace(key)
     if key == "" {
         j.Data = value
         return
     }
 
-    if _, ok := (j.Data).(map[string]interface{}); !ok {
-        j.Data = make(map[string]interface{})
+    result, err := j.Map()
+    if err != nil {
+        return
     }
 
     keys := strings.Split(key, ".")
-    result := j.Data.(map[string]interface{})
-
     for i:=0; i<len(keys)-1; i++  {
         v := strings.TrimSpace(keys[i])
         if v != "" {
@@ -167,56 +158,87 @@ func (j *Json) Sets(key string, value interface{}) {
 }
 
 
-// check json object has key
+// check json object has key, dot(.) separated key is supported
+//   json.Has("status")
+//   json.Has("status.code")
+//   json.Has("result.intlist.3")
 func (j *Json) Has(key string) (bool) {
     result, err := j.Map()
-    if err == nil {
-        _, exists := result[key]
-        return exists
+    if err != nil {
+        return false
     }
 
-    return false
-}
-
-
-// delete key-value from json object
-func (j *Json) Del(key string) {
-    result, err := j.Map()
-    if err == nil {
-        delete(result, key)
-    }
-}
-
-
-// returns the pointer to json object by key
-//   json.Get("status").Get("code").Int()
-func (j *Json) Get(key string) (*Json) {
-    result, err := j.Map()
-    if err == nil {
-        if value, exists := result[key]; exists {
-            return &Json{value}
+    ok := false
+    keys := strings.Split(key, ".")
+    for i:=0; i<len(keys)-1; i++  {
+        v := strings.TrimSpace(keys[i])
+        if v != "" {
+            if _, ok = result[v]; !ok {
+                return false
+            }
+            result, ok = result[v].(map[string]interface{})
+            if !ok {
+                return false
+            }
         }
     }
 
-    return &Json{nil}
+    _, exists := result[keys[len(keys) - 1]]
+
+    return exists
 }
 
 
-// returns a pointer to the path of json object
-//   json.Gets("status/code").Int()
-//   json.Gets("result/intlist/3").Int()
-func (j *Json) Gets(key string) (*Json) {
+// delete key-value from json object, dot(.) separated key is supported
+//   json.Del("status")
+//   json.Del("status.code")
+//   json.Del("result.intlist.3")
+func (j *Json) Del(key string) {
+    result, err := j.Map()
+    if err != nil {
+        return
+    }
+
+    ok := false
+    keys := strings.Split(key, ".")
+    for i:=0; i<len(keys)-1; i++  {
+        v := strings.TrimSpace(keys[i])
+        if v != "" {
+            if _, ok = result[v]; !ok {
+                return
+            }
+            result, ok = result[v].(map[string]interface{})
+            if !ok {
+                return
+            }
+        }
+    }
+
+    if _, ok := result[keys[len(keys) - 1]]; ok {
+        delete(result, keys[len(keys) - 1])
+    }
+}
+
+
+// returns the pointer to json object by key, dot(.) separated key is supported
+//   json.Get("status").Int()
+//   json.Get("status.code").Int()
+//   json.Get("result.intlist.3").Int()
+func (j *Json) Get(key string) (*Json) {
     result := j
 
     for _, v := range strings.Split(key, ".") {
         v = strings.TrimSpace(v)
         if v != "" {
             if result.Has(v) {
-                result = result.Get(v)
+                data, err := result.Map()
+                if err == nil {
+                    result = &Json{data[v]}
+                }
             } else {
                 i, err := strconv.Atoi(v)
                 if err == nil {
-                    result = result.GetIndex(i)
+                    result = result.GetN(i)
                 }
             }
         }
@@ -227,8 +249,8 @@ func (j *Json) Gets(key string) (*Json) {
 
 
 // returns a pointer to the index of json object
-//   json.Get("int_list").GetIndex(1).Int()
-func (j *Json) GetIndex(i int) (*Json) {
+//   json.Get("int_list").GetN(1).Int()
+func (j *Json) GetN(i int) (*Json) {
     data, err := j.Array()
     if err == nil {
         if len(data) > i {
