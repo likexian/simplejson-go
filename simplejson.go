@@ -26,13 +26,13 @@ import (
 
 // storing json data
 type Json struct {
-    Data interface{}
+    data interface{}
 }
 
 
 // returns package version
 func Version() string {
-    return "0.8.1"
+    return "0.8.2"
 }
 
 
@@ -50,16 +50,16 @@ func License() string {
 
 // returns a pointer to a new Json object
 //   data_json := New()
-//   data_json := New(type data struct{Data string}{})
+//   data_json := New(type Data struct{data string}{})
 func New(args ...interface{}) (*Json) {
     switch len(args) {
         case 1:
             return &Json {
-                Data: args[0],
+                data: args[0],
             }
         default:
             return &Json {
-                Data: make(map[string]interface{}),
+                data: make(map[string]interface{}),
             }
     }
 }
@@ -104,7 +104,7 @@ func Loads(text string) (j *Json, err error) {
 
     dec := json.NewDecoder(bytes.NewBuffer([]byte(text)))
     dec.UseNumber()
-    err = dec.Decode(&j.Data)
+    err = dec.Decode(&j.data)
 
     return
 }
@@ -112,7 +112,7 @@ func Loads(text string) (j *Json, err error) {
 
 // marshal json object to string
 func (j *Json) Dumps() (result string, err error) {
-    data, err := json.Marshal(&j.Data)
+    data, err := json.Marshal(&j.data)
     if err != nil {
         return
     }
@@ -125,7 +125,7 @@ func (j *Json) Dumps() (result string, err error) {
 
 // marshal json object to string, with identation
 func (j *Json) PrettyDumps() (result string, err error) {
-    data, err := json.MarshalIndent(&j.Data, "", "    ")
+    data, err := json.MarshalIndent(&j.data, "", "    ")
     if err != nil {
         return
     }
@@ -143,7 +143,7 @@ func (j *Json) PrettyDumps() (result string, err error) {
 func (j *Json) Set(key string, value interface{}) {
     key = strings.TrimSpace(key)
     if key == "" {
-        j.Data = value
+        j.data = value
         return
     }
 
@@ -273,7 +273,7 @@ func (j *Json) GetN(i int) (*Json) {
 
 // returns as map from json object
 func (j *Json) Map() (result map[string]interface{}, err error) {
-    result, ok := (j.Data).(map[string]interface{})
+    result, ok := (j.data).(map[string]interface{})
     if !ok {
         err = errors.New("assert to map failed")
     }
@@ -283,7 +283,7 @@ func (j *Json) Map() (result map[string]interface{}, err error) {
 
 // returns as array from json object
 func (j *Json) Array() (result []interface{}, err error) {
-    result, ok := (j.Data).([]interface{})
+    result, ok := (j.data).([]interface{})
     if !ok {
         err = errors.New("assert to array failed")
     }
@@ -293,7 +293,7 @@ func (j *Json) Array() (result []interface{}, err error) {
 
 // returns as bool from json object
 func (j *Json) Bool() (result bool, err error) {
-    result, ok := (j.Data).(bool)
+    result, ok := (j.data).(bool)
     if !ok {
         err = errors.New("assert to bool failed")
     }
@@ -303,7 +303,7 @@ func (j *Json) Bool() (result bool, err error) {
 
 // returns as string from json object
 func (j *Json) String() (result string, err error) {
-    result, ok := (j.Data).(string)
+    result, ok := (j.data).(string)
     if !ok {
         err = errors.New("assert to string failed")
     }
@@ -337,15 +337,15 @@ func (j *Json) StringArray() (result []string, err error) {
 
 // returns as float64 from json object
 func (j *Json) Float64() (result float64, err error) {
-    switch j.Data.(type) {
+    switch j.data.(type) {
         case json.Number:
-            return j.Data.(json.Number).Float64()
+            return j.data.(json.Number).Float64()
         case float32, float64:
-            return reflect.ValueOf(j.Data).Float(), nil
+            return reflect.ValueOf(j.data).Float(), nil
         case int, int8, int16, int32, int64:
-            return float64(reflect.ValueOf(j.Data).Int()), nil
+            return float64(reflect.ValueOf(j.data).Int()), nil
         case uint, uint8, uint16, uint32, uint64:
-            return float64(reflect.ValueOf(j.Data).Uint()), nil
+            return float64(reflect.ValueOf(j.data).Uint()), nil
         default:
             return 0, errors.New("invalid value type")
     }
@@ -354,16 +354,16 @@ func (j *Json) Float64() (result float64, err error) {
 
 // returns as int from json object
 func (j *Json) Int() (result int, err error) {
-    switch j.Data.(type) {
+    switch j.data.(type) {
         case json.Number:
-            r, err := j.Data.(json.Number).Int64()
+            r, err := j.data.(json.Number).Int64()
             return int(r), err
         case float32, float64:
-            return int(reflect.ValueOf(j.Data).Float()), nil
+            return int(reflect.ValueOf(j.data).Float()), nil
         case int, int8, int16, int32, int64:
-            return int(reflect.ValueOf(j.Data).Int()), nil
+            return int(reflect.ValueOf(j.data).Int()), nil
         case uint, uint8, uint16, uint32, uint64:
-            return int(reflect.ValueOf(j.Data).Uint()), nil
+            return int(reflect.ValueOf(j.data).Uint()), nil
         default:
             return 0, errors.New("invalid value type")
     }
@@ -372,15 +372,15 @@ func (j *Json) Int() (result int, err error) {
 
 // returns as int64 from json object
 func (j *Json) Int64() (result int64, err error) {
-    switch j.Data.(type) {
+    switch j.data.(type) {
         case json.Number:
-            return j.Data.(json.Number).Int64()
+            return j.data.(json.Number).Int64()
         case float32, float64:
-            return int64(reflect.ValueOf(j.Data).Float()), nil
+            return int64(reflect.ValueOf(j.data).Float()), nil
         case int, int8, int16, int32, int64:
-            return reflect.ValueOf(j.Data).Int(), nil
+            return reflect.ValueOf(j.data).Int(), nil
         case uint, uint8, uint16, uint32, uint64:
-            return int64(reflect.ValueOf(j.Data).Uint()), nil
+            return int64(reflect.ValueOf(j.data).Uint()), nil
         default:
             return 0, errors.New("invalid value type")
     }
@@ -389,15 +389,15 @@ func (j *Json) Int64() (result int64, err error) {
 
 // returns as uint64 from json object
 func (j *Json) Uint64() (result uint64, err error) {
-    switch j.Data.(type) {
+    switch j.data.(type) {
         case json.Number:
-            return strconv.ParseUint(j.Data.(json.Number).String(), 10, 64)
+            return strconv.ParseUint(j.data.(json.Number).String(), 10, 64)
         case float32, float64:
-            return uint64(reflect.ValueOf(j.Data).Float()), nil
+            return uint64(reflect.ValueOf(j.data).Float()), nil
         case int, int8, int16, int32, int64:
-            return uint64(reflect.ValueOf(j.Data).Int()), nil
+            return uint64(reflect.ValueOf(j.data).Int()), nil
         case uint, uint8, uint16, uint32, uint64:
-            return reflect.ValueOf(j.Data).Uint(), nil
+            return reflect.ValueOf(j.data).Uint(), nil
         default:
             return 0, errors.New("invalid value type")
     }
