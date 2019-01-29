@@ -54,10 +54,8 @@ func TestSimplejson(t *testing.T) {
     data_json_result.Result = data_result
     data_json_result.Status = data_status
 
-    data_json := Json{}
-    data_json.Data = data_json_result
-
-    data, err := Dumps(&data_json)
+    data_json := New(data_json_result)
+    data, err := data_json.Dumps()
     assert.Equal(t, nil, err)
     assert.Equal(t, data, `{"result":{"intlist":[0,1,2,3,4],"strlist":["0","1","2","3","4"],"online":true,"rate":0.8},"status":{"code":1,"message":"success"}}`)
 
@@ -154,7 +152,7 @@ func TestSimplejson(t *testing.T) {
     gets_data, err = json_data.Get("status.not-exists").Int()
     assert.NotEqual(t, nil, err)
 
-    result, err := Dumps(json_data)
+    result, err := json_data.Dumps()
     assert.Equal(t, nil, err)
     assert.Equal(t, true, strings.Contains(result, `"strlist":["0","1","2","3","4"]`))
     assert.Equal(t, true, strings.Contains(result, `"intlist":[0,1,2,3,4]`))
@@ -164,7 +162,7 @@ func TestSimplejson(t *testing.T) {
     name, _ := json_data.Get("name").String()
     assert.Equal(t, "Li Kexian", name)
 
-    bytes, err := Dump("simplejson.json", json_data)
+    bytes, err := json_data.Dump("simplejson.json")
     assert.NotEqual(t, 0, bytes)
     assert.Equal(t, nil, err)
 

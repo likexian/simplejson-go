@@ -40,20 +40,20 @@ Initialize the struct and set value
 
 Dump the struct data to JSON string
 
-    data_json := simplejson.Json{}
-    data_json.Data = data_status
-    data, err := simplejson.Dumps(&data_json)
+    data_json := New(data_status)
+    text, err := data_json.Dumps()
     if err == nil {
-        fmt.Println(data)
+        // Get the text of JSON
+        fmt.Println(text)
     }
 
 Load the JSON string
 
-    json, err := Loads(text)
+    data_json, err := Loads(text)
     if err == nil {
         // Get the value of JSON
-        fmt.Println(json.Get("Code").Int())
-        fmt.Println(json.Get("Message").String())
+        fmt.Println(data_json.Get("Code").Int())
+        fmt.Println(data_json.Get("Message").String())
     }
 
 ## LICENSE

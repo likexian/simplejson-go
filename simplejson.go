@@ -32,7 +32,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.8.0"
+    return "0.8.1"
 }
 
 
@@ -49,30 +49,39 @@ func License() string {
 
 
 // returns a pointer to a new Json object
-func New() (*Json) {
-    return &Json {
-        Data: make(map[string]interface{}),
+//   data_json := New()
+//   data_json := New(type data struct{Data string}{})
+func New(args ...interface{}) (*Json) {
+    switch len(args) {
+        case 1:
+            return &Json {
+                Data: args[0],
+            }
+        default:
+            return &Json {
+                Data: make(map[string]interface{}),
+            }
     }
 }
 
 
 // loads data from a file, returns a json object
-func Load(file string) (result *Json, err error) {
+func Load(file string) (j *Json, err error) {
     data, err := ioutil.ReadFile(file)
     if err != nil {
         return
     }
 
     text := string(data)
-    result, err = Loads(text)
+    j, err = Loads(text)
 
     return
 }
 
 
 // dumps json object to a file
-func Dump(file string, data *Json) (bytes int, err error) {
-    result, err := PrettyDumps(data)
+func (j *Json) Dump(file string) (bytes int, err error) {
+    result, err := j.PrettyDumps()
     if err != nil {
         return
     }
@@ -90,19 +99,19 @@ func Dump(file string, data *Json) (bytes int, err error) {
 
 
 // unmarshal json from string, returns json object
-func Loads(text string) (result *Json, err error) {
-    result = new(Json)
+func Loads(text string) (j *Json, err error) {
+    j = new(Json)
 
     dec := json.NewDecoder(bytes.NewBuffer([]byte(text)))
     dec.UseNumber()
-    err = dec.Decode(&result.Data)
+    err = dec.Decode(&j.Data)
 
     return
 }
 
 
 // marshal json object to string
-func Dumps(j *Json) (result string, err error) {
+func (j *Json) Dumps() (result string, err error) {
     data, err := json.Marshal(&j.Data)
     if err != nil {
         return
@@ -115,7 +124,7 @@ func Dumps(j *Json) (result string, err error) {
 
 
 // marshal json object to string, with identation
-func PrettyDumps(j *Json) (result string, err error) {
+func (j *Json) PrettyDumps() (result string, err error) {
     data, err := json.MarshalIndent(&j.Data, "", "    ")
     if err != nil {
         return
