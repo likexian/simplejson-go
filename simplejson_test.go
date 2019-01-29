@@ -120,17 +120,17 @@ func TestSimplejson(t *testing.T) {
     assert.Equal(t, "int", fmt.Sprintf("%T", index_data))
     assert.Equal(t, 0, index_data)
 
-    gets_data, err := json_data.Gets("status/code").Int()
+    gets_data, err := json_data.Gets("status.code").Int()
     assert.Equal(t, nil, err)
     assert.Equal(t, "int", fmt.Sprintf("%T", gets_data))
     assert.Equal(t, 1, gets_data)
 
-    gets_data, err = json_data.Gets("result/intlist/3").Int()
+    gets_data, err = json_data.Gets("result.intlist.3").Int()
     assert.Equal(t, nil, err)
     assert.Equal(t, "int", fmt.Sprintf("%T", gets_data))
     assert.Equal(t, 3, gets_data)
 
-    gets_data, err = json_data.Gets("status/not-exists").Int()
+    gets_data, err = json_data.Gets("status.not-exists").Int()
     assert.NotEqual(t, nil, err)
 
     result, err := Dumps(json_data)
@@ -151,8 +151,8 @@ func TestSimplejson(t *testing.T) {
     assert.Equal(t, json_data, njson)
     assert.Equal(t, nil, err)
 
-    json_data.Sets("status/error/code", 666)
-    gets_data, err = json_data.Gets("status/error/code").Int()
+    json_data.Sets("status.error.code", 666)
+    gets_data, err = json_data.Gets("status.error.code").Int()
     assert.Equal(t, nil, err)
     assert.Equal(t, "int", fmt.Sprintf("%T", gets_data))
     assert.Equal(t, 666, gets_data)

@@ -150,7 +150,7 @@ func (j *Json) Sets(key string, value interface{}) {
         j.Data = make(map[string]interface{})
     }
 
-    keys := strings.Split(key, "/")
+    keys := strings.Split(key, ".")
     result := j.Data.(map[string]interface{})
 
     for i:=0; i<len(keys)-1; i++  {
@@ -208,7 +208,7 @@ func (j *Json) Get(key string) (*Json) {
 func (j *Json) Gets(key string) (*Json) {
     result := j
 
-    for _, v := range strings.Split(key, "/") {
+    for _, v := range strings.Split(key, ".") {
         v = strings.TrimSpace(v)
         if v != "" {
             if result.Has(v) {
@@ -374,6 +374,7 @@ func (j *Json) Uint64() (result uint64, err error) {
 
 
 // returns as bool from json object with optional default value
+//   if error return false or default(if set)
 func (j *Json) MustBool(args ...bool) (bool) {
     var def bool
 
@@ -395,6 +396,7 @@ func (j *Json) MustBool(args ...bool) (bool) {
 
 
 // returns as string from json object with optional default value
+//   if error return "" or default(if set)
 func (j *Json) MustString(args ...string) (string) {
     var def string
 
@@ -416,6 +418,7 @@ func (j *Json) MustString(args ...string) (string) {
 
 
 // returns as string from json object with optional default value
+//   if error return []string or default(if set)
 func (j *Json) MustStringArray(args ...[]string) ([]string) {
     var def []string
 
@@ -437,6 +440,7 @@ func (j *Json) MustStringArray(args ...[]string) ([]string) {
 
 
 // returns as float64 from json object with optional default value
+//   if error return float64(0) or default(if set)
 func (j *Json) MustFloat64(args ...float64) (float64) {
     var def float64
 
@@ -458,6 +462,7 @@ func (j *Json) MustFloat64(args ...float64) (float64) {
 
 
 // returns as int from json object with optional default value
+//   if error return int(0) or default(if set)
 func (j *Json) MustInt(args ...int) (int) {
     var def int
 
@@ -479,6 +484,7 @@ func (j *Json) MustInt(args ...int) (int) {
 
 
 // returns as int64 from json object with optional default value
+//   if error return int64(0) or default(if set)
 func (j *Json) MustInt64(args ...int64) (int64) {
     var def int64
 
@@ -500,6 +506,7 @@ func (j *Json) MustInt64(args ...int64) (int64) {
 
 
 // returns as uint64 from json object with optional default value
+//   if error return uint64(0) or default(if set)
 func (j *Json) MustUint64(args ...uint64) (uint64) {
     var def uint64
 
