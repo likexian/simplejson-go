@@ -32,7 +32,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.8.2"
+    return "0.8.3"
 }
 
 
@@ -139,7 +139,7 @@ func (j *Json) PrettyDumps() (result string, err error) {
 // set key-value to json object, dot(.) separated key is supported
 //   json.Set("status", 1)
 //   json.Set("status.code", 1)
-//   json.Set("result.intlist.3", 666)
+//   ! NOT SUPPORTED json.Set("result.intlist.3", 666)
 func (j *Json) Set(key string, value interface{}) {
     key = strings.TrimSpace(key)
     if key == "" {
@@ -172,36 +172,50 @@ func (j *Json) Set(key string, value interface{}) {
 //   json.Has("status.code")
 //   json.Has("result.intlist.3")
 func (j *Json) Has(key string) (bool) {
-    result, err := j.Map()
-    if err != nil {
-        return false
-    }
+    result := j
 
-    ok := false
     keys := strings.Split(key, ".")
-    for i:=0; i<len(keys)-1; i++  {
+    for i:=0; i<len(keys); i++  {
         v := strings.TrimSpace(keys[i])
         if v != "" {
-            if _, ok = result[v]; !ok {
-                return false
-            }
-            result, ok = result[v].(map[string]interface{})
-            if !ok {
-                return false
+            tmp, err := result.Map()
+            if err == nil {
+                if _, ok := tmp[v]; !ok {
+                    return false
+                }
+                if i == len(keys) - 1 {
+                    return true
+                }
+                result = result.Get(v)
+            } else {
+                tmp, err := result.Array()
+                if err == nil {
+                    n, err := strconv.Atoi(v)
+                    if err != nil {
+                        return false
+                    }
+                    if n >= len(tmp) {
+                        return false
+                    }
+                    if i == len(keys) - 1 {
+                        return true
+                    }
+                    result = result.GetN(n)
+                } else {
+                    return false
+                }
             }
         }
     }
 
-    _, exists := result[keys[len(keys) - 1]]
-
-    return exists
+    return false
 }
 
 
 // delete key-value from json object, dot(.) separated key is supported
 //   json.Del("status")
 //   json.Del("status.code")
-//   json.Del("result.intlist.3")
+//   ! NOT SUPPORTED json.Del("result.intlist.3")
 func (j *Json) Del(key string) {
     result, err := j.Map()
     if err != nil {
@@ -239,15 +253,23 @@ func (j *Json) Get(key string) (*Json) {
     for _, v := range strings.Split(key, ".") {
         v = strings.TrimSpace(v)
         if v != "" {
-            if result.Has(v) {
-                data, err := result.Map()
-                if err == nil {
-                    result = &Json{data[v]}
+            tmp, err := result.Map()
+            if err == nil {
+                if _, ok := tmp[v]; ok {
+                    result = &Json{tmp[v]}
+                } else {
+                    return &Json{nil}
                 }
             } else {
-                i, err := strconv.Atoi(v)
+                _, err := result.Array()
                 if err == nil {
+                    i, err := strconv.Atoi(v)
+                    if err != nil {
+                        return &Json{nil}
+                    }
                     result = result.GetN(i)
+                } else {
+                    return &Json{nil}
                 }
             }
         }
@@ -407,7 +429,7 @@ func (j *Json) Uint64() (result uint64, err error) {
 // returns as bool from json object with optional default value
 //   if error return false or default(if set)
 func (j *Json) MustBool(args ...bool) (bool) {
-    var def bool
+    def := false
 
     switch len(args) {
         case 0:
@@ -429,7 +451,7 @@ func (j *Json) MustBool(args ...bool) (bool) {
 // returns as string from json object with optional default value
 //   if error return "" or default(if set)
 func (j *Json) MustString(args ...string) (string) {
-    var def string
+    def := ""
 
     switch len(args) {
         case 0:
@@ -451,7 +473,7 @@ func (j *Json) MustString(args ...string) (string) {
 // returns as string from json object with optional default value
 //   if error return []string or default(if set)
 func (j *Json) MustStringArray(args ...[]string) ([]string) {
-    var def []string
+    def := []string{}
 
     switch len(args) {
         case 0:

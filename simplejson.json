@@ -1,6 +1,10 @@
 {
-    "im": {
-        "set": {}
+    "i": {
+        "am": {
+            "that": {
+                "who": "Li Kexian"
+            }
+        }
     },
     "link": "https://www.likexian.com/",
     "name": "Li Kexian",
@@ -13,14 +17,7 @@
             4
         ],
         "online": true,
-        "rate": 0.8,
-        "strlist": [
-            "0",
-            "1",
-            "2",
-            "3",
-            "4"
-        ]
+        "rate": 0.8
     },
     "status": {
         "code": 1,
