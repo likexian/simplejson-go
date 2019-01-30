@@ -238,6 +238,30 @@ func Test_Set_Has_Get_Del_W_List(t *testing.T) {
     exists = json_data.Has("that.is.a.list.666")
     assert.Equal(t, exists, false)
 
+    // Test set dict in list
+    json_data.Set("that.is.a.dict.in.list", []interface{}{map[string]interface{}{"a": 1, "b": 2, "c": 3}})
+    exists = json_data.Has("that.is.a.dict.in.list")
+    assert.Equal(t, exists, true)
+
+    // Test dict in list exists
+    exists = json_data.Has("that.is.a.dict.in.list.0")
+    assert.Equal(t, exists, true)
+    exists = json_data.Has("that.is.a.dict.in.list.0.a")
+    assert.Equal(t, exists, true)
+    exists = json_data.Has("that.is.a.dict.in.list.1.a")
+    assert.Equal(t, exists, false)
+    exists = json_data.Has("that.is.a.dict.in.list.0.z")
+    assert.Equal(t, exists, false)
+
+    // Test get dict in list
+    int_data, err := json_data.Get("that.is.a.dict.in.list.0.b").Int()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, int_data, 2)
+    int_data, err = json_data.Get("that.is.a.dict.in.list.1.b").Int()
+    assert.NotEqual(t, err, nil)
+    int_data, err = json_data.Get("that.is.a.dict.in.list.0.z").Int()
+    assert.NotEqual(t, err, nil)
+
     // Get the list value
     r_number, err := json_data.Get("that.is.a.list.3").Int()
     assert.Equal(t, err, nil)
