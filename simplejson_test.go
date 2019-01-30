@@ -13,6 +13,7 @@ package simplejson
 import (
     "os"
     "fmt"
+    "runtime"
     "encoding/json"
     "testing"
     "github.com/bmizerany/assert"
@@ -45,6 +46,22 @@ var (
     json_name   = "Li Kexian"
     json_link   = "https://www.likexian.com/"
 )
+
+
+func test_must_panic(t *testing.T, test_func func()) {
+    defer func() {
+        err := recover()
+        if err == nil {
+            _, file, line, ok := runtime.Caller(2)
+            if ok {
+                t.Errorf("%s: %d", file, line)
+            }
+        }
+        assert.NotEqual(t, err, nil)
+    }()
+
+    test_func()
+}
 
 
 func init() {
@@ -356,6 +373,16 @@ func Test_Set_Has_Get_Del_Type(t *testing.T) {
     assert.Equal(t, json_data.Has("uint64"), true)
     json_data.Del("uint64")
     assert.Equal(t, json_data.Has("uint64"), false)
+
+    // Set string array value
+    json_data.Set("string_array", []interface{}{"a", "b", "c"})
+    string_array_data, err := json_data.Get("string_array").StringArray()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, string_array_data, []string{"a", "b", "c"})
+    assert.Equal(t, "[]string", fmt.Sprintf("%T", string_array_data))
+    assert.Equal(t, json_data.Has("string_array"), true)
+    json_data.Del("string_array")
+    assert.Equal(t, json_data.Has("string_array"), false)
 }
 
 
@@ -414,7 +441,7 @@ func Test_Get_Assert_Data(t *testing.T) {
     assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_data))
     assert.Equal(t, uint64_data, uint64(1))
 
-    // Set string array
+    // Get data as string array
     json_data.Set("that.is.a.list", []interface{}{"a", "b", "c", "d", "e"})
     string_array_data, err := json_data.Get("that.is.a.list").StringArray()
     assert.Equal(t, err, nil)
@@ -458,7 +485,7 @@ func Test_Get_Must_Assert_Data(t *testing.T) {
     assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_data))
     assert.Equal(t, uint64_data, uint64(1))
 
-    // Set string array
+    // Get data as string array
     json_data.Set("that.is.a.list", []interface{}{"a", "b", "c", "d", "e"})
     string_array_data := json_data.Get("that.is.a.list").MustStringArray()
     assert.Equal(t, "[]string", fmt.Sprintf("%T", string_array_data))
@@ -472,39 +499,46 @@ func Test_Get_Must_Assert_Data_N_Default(t *testing.T) {
     assert.Equal(t, err, nil)
 
     // Get data as bool
-    bool_data := json_data.Get("not-exists").MustBool()
-    assert.Equal(t, "bool", fmt.Sprintf("%T", bool_data))
-    assert.Equal(t, bool_data, false)
+    test_must_panic(t, func(){
+        r_data := json_data.Get("not-exists").MustBool()
+        assert.Equal(t, r_data, false)
+    })
 
     // Get data as string
-    string_data := json_data.Get("not-exists").MustString()
-    assert.Equal(t, "string", fmt.Sprintf("%T", string_data))
-    assert.Equal(t, string_data, "")
+    test_must_panic(t, func(){
+        r_data := json_data.Get("not-exists").MustString()
+        assert.Equal(t, r_data, "")
+    })
 
     // Get data as float64
-    float64_data := json_data.Get("not-exists").MustFloat64()
-    assert.Equal(t, "float64", fmt.Sprintf("%T", float64_data))
-    assert.Equal(t, float64_data, float64(0))
+    test_must_panic(t, func(){
+        r_data := json_data.Get("not-exists").MustFloat64()
+        assert.Equal(t, r_data, float64(0))
+    })
 
     // Get data as int
-    int_data := json_data.Get("not-exists").MustInt()
-    assert.Equal(t, "int", fmt.Sprintf("%T", int_data))
-    assert.Equal(t, int_data, int(0))
+    test_must_panic(t, func(){
+        r_data := json_data.Get("not-exists").MustInt()
+        assert.Equal(t, r_data, int(0))
+    })
 
     // Get data as int64
-    int64_data := json_data.Get("not-exists").MustInt64()
-    assert.Equal(t, "int64", fmt.Sprintf("%T", int64_data))
-    assert.Equal(t, int64_data, int64(0))
+    test_must_panic(t, func(){
+        r_data := json_data.Get("not-exists").MustInt64()
+        assert.Equal(t, r_data, int64(0))
+    })
 
     // Get data as uint64
-    uint64_data := json_data.Get("not-exists").MustUint64()
-    assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_data))
-    assert.Equal(t, uint64_data, uint64(0))
+    test_must_panic(t, func(){
+        r_data := json_data.Get("not-exists").MustUint64()
+        assert.Equal(t, r_data, uint64(0))
+    })
 
-    // Set string array
-    string_array_data := json_data.Get("not-exists").MustStringArray()
-    assert.Equal(t, "[]string", fmt.Sprintf("%T", string_array_data))
-    assert.Equal(t, string_array_data, []string{})
+    // Get data as string array
+    test_must_panic(t, func(){
+        r_data := json_data.Get("not-exists").MustStringArray()
+        assert.Equal(t, r_data, []string{})
+    })
 }
 
 
@@ -543,7 +577,7 @@ func Test_Get_Must_Assert_Data_W_Default(t *testing.T) {
     assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64_data))
     assert.Equal(t, uint64_data, uint64(666))
 
-    // Set string array
+    // Get data as string array
     string_array_data := json_data.Get("not-exists").MustStringArray([]string{"i", "am", "ok"})
     assert.Equal(t, "[]string", fmt.Sprintf("%T", string_array_data))
     assert.Equal(t, string_array_data, []string{"i", "am", "ok"})

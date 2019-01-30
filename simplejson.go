@@ -20,7 +20,6 @@ import (
     "reflect"
     "strings"
     "strconv"
-    "log"
 )
 
 
@@ -32,7 +31,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.8.3"
+    return "0.8.4"
 }
 
 
@@ -427,16 +426,10 @@ func (j *Json) Uint64() (result uint64, err error) {
 
 
 // returns as bool from json object with optional default value
-//   if error return false or default(if set)
+//   if error return default(if set) or panic
 func (j *Json) MustBool(args ...bool) (bool) {
-    def := false
-
-    switch len(args) {
-        case 0:
-        case 1:
-            def = args[0]
-        default:
-            log.Panicf("MustBool received too many arguments %d > 1", len(args))
+    if len(args) > 1 {
+        panic("Too many arguments")
     }
 
     r, err := j.Bool()
@@ -444,21 +437,19 @@ func (j *Json) MustBool(args ...bool) (bool) {
         return r
     }
 
-    return def
+    if len(args) == 1 {
+        return args[0]
+    } else {
+        panic(err)
+    }
 }
 
 
 // returns as string from json object with optional default value
-//   if error return "" or default(if set)
+//   if error return default(if set) or panic
 func (j *Json) MustString(args ...string) (string) {
-    def := ""
-
-    switch len(args) {
-        case 0:
-        case 1:
-            def = args[0]
-        default:
-            log.Panicf("MustString received too many arguments %d > 1", len(args))
+    if len(args) > 1 {
+        panic("Too many arguments")
     }
 
     r, err := j.String()
@@ -466,21 +457,19 @@ func (j *Json) MustString(args ...string) (string) {
         return r
     }
 
-    return def
+    if len(args) == 1 {
+        return args[0]
+    } else {
+        panic(err)
+    }
 }
 
 
 // returns as string from json object with optional default value
-//   if error return []string or default(if set)
+//   if error return default(if set) or panic
 func (j *Json) MustStringArray(args ...[]string) ([]string) {
-    def := []string{}
-
-    switch len(args) {
-        case 0:
-        case 1:
-            def = args[0]
-        default:
-            log.Panicf("MustStringArray received too many arguments %d > 1", len(args))
+    if len(args) > 1 {
+        panic("Too many arguments")
     }
 
     r, err := j.StringArray()
@@ -488,21 +477,19 @@ func (j *Json) MustStringArray(args ...[]string) ([]string) {
         return r
     }
 
-    return def
+    if len(args) == 1 {
+        return args[0]
+    } else {
+        panic(err)
+    }
 }
 
 
 // returns as float64 from json object with optional default value
-//   if error return float64(0) or default(if set)
+//   if error return default(if set) or panic
 func (j *Json) MustFloat64(args ...float64) (float64) {
-    var def float64
-
-    switch len(args) {
-        case 0:
-        case 1:
-            def = args[0]
-        default:
-            log.Panicf("MustFloat64 received too many arguments %d > 1", len(args))
+    if len(args) > 1 {
+        panic("Too many arguments")
     }
 
     r, err := j.Float64()
@@ -510,21 +497,19 @@ func (j *Json) MustFloat64(args ...float64) (float64) {
         return r
     }
 
-    return def
+    if len(args) == 1 {
+        return args[0]
+    } else {
+        panic(err)
+    }
 }
 
 
 // returns as int from json object with optional default value
-//   if error return int(0) or default(if set)
+//   if error return default(if set) or panic
 func (j *Json) MustInt(args ...int) (int) {
-    var def int
-
-    switch len(args) {
-        case 0:
-        case 1:
-            def = args[0]
-        default:
-            log.Panicf("MustInt received too many arguments %d > 1", len(args))
+    if len(args) > 1 {
+        panic("Too many arguments")
     }
 
     r, err := j.Int()
@@ -532,21 +517,19 @@ func (j *Json) MustInt(args ...int) (int) {
         return r
     }
 
-    return def
+    if len(args) == 1 {
+        return args[0]
+    } else {
+        panic(err)
+    }
 }
 
 
 // returns as int64 from json object with optional default value
-//   if error return int64(0) or default(if set)
+//   if error return default(if set) or panic
 func (j *Json) MustInt64(args ...int64) (int64) {
-    var def int64
-
-    switch len(args) {
-        case 0:
-        case 1:
-            def = args[0]
-        default:
-            log.Panicf("MustInt64 received too many arguments %d > 1", len(args))
+    if len(args) > 1 {
+        panic("Too many arguments")
     }
 
     r, err := j.Int64()
@@ -554,21 +537,19 @@ func (j *Json) MustInt64(args ...int64) (int64) {
         return r
     }
 
-    return def
+    if len(args) == 1 {
+        return args[0]
+    } else {
+        panic(err)
+    }
 }
 
 
 // returns as uint64 from json object with optional default value
-//   if error return uint64(0) or default(if set)
+//   if error return default(if set) or panic
 func (j *Json) MustUint64(args ...uint64) (uint64) {
-    var def uint64
-
-    switch len(args) {
-        case 0:
-        case 1:
-            def = args[0]
-        default:
-            log.Panicf("MustUint64 received too many arguments %d > 1", len(args))
+    if len(args) > 1 {
+        panic("Too many arguments")
     }
 
     r, err := j.Uint64()
@@ -576,5 +557,9 @@ func (j *Json) MustUint64(args ...uint64) (uint64) {
         return r
     }
 
-    return def
+    if len(args) == 1 {
+        return args[0]
+    } else {
+        panic(err)
+    }
 }
