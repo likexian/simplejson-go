@@ -25,7 +25,8 @@ import (
 
 // storing json data
 type Json struct {
-    data interface{}
+    data        interface{}
+    escapeHtml  bool
 }
 
 
@@ -61,6 +62,12 @@ func New(args ...interface{}) (*Json) {
                 data: make(map[string]interface{}),
             }
     }
+}
+
+
+// set html escape for escaping of <, >, and & in JSON strings
+func (j *Json) SetHtmlEscape(escape bool) {
+    j.escapeHtml = escape
 }
 
 
@@ -111,25 +118,30 @@ func Loads(text string) (j *Json, err error) {
 
 // marshal json object to string
 func (j *Json) Dumps() (result string, err error) {
-    data, err := json.Marshal(&j.data)
-    if err != nil {
-        return
-    }
-
-    result = string(data)
-
-    return
+    return j.doDumps("")
 }
 
 
 // marshal json object to string, with identation
 func (j *Json) PrettyDumps() (result string, err error) {
-    data, err := json.MarshalIndent(&j.data, "", "    ")
+    return j.doDumps(strings.Repeat(" ", 4))
+}
+
+
+// do marshal json to string
+func (j *Json) doDumps(indent string) (result string, err error) {
+    var buf bytes.Buffer
+
+    enc := json.NewEncoder(&buf)
+    enc.SetEscapeHTML(j.escapeHtml)
+    enc.SetIndent("", indent)
+    err = enc.Encode(j.data)
     if err != nil {
         return
     }
 
-    result = string(data)
+    result = buf.String()
+    result = strings.TrimSpace(result)
 
     return
 }
@@ -255,20 +267,20 @@ func (j *Json) Get(key string) (*Json) {
             tmp, err := result.Map()
             if err == nil {
                 if _, ok := tmp[v]; ok {
-                    result = &Json{tmp[v]}
+                    result = &Json{tmp[v], j.escapeHtml}
                 } else {
-                    return &Json{nil}
+                    return &Json{nil, j.escapeHtml}
                 }
             } else {
                 _, err := result.Array()
                 if err == nil {
                     i, err := strconv.Atoi(v)
                     if err != nil {
-                        return &Json{nil}
+                        return &Json{nil, j.escapeHtml}
                     }
                     result = result.GetN(i)
                 } else {
-                    return &Json{nil}
+                    return &Json{nil, j.escapeHtml}
                 }
             }
         }
@@ -284,11 +296,11 @@ func (j *Json) GetN(i int) (*Json) {
     data, err := j.Array()
     if err == nil {
         if len(data) > i {
-            return &Json{data[i]}
+            return &Json{data[i], j.escapeHtml}
         }
     }
 
-    return &Json{nil}
+    return &Json{nil, j.escapeHtml}
 }
 
 

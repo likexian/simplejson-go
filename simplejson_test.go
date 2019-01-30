@@ -500,44 +500,37 @@ func Test_Get_Must_Assert_Data_N_Default(t *testing.T) {
 
     // Get data as bool
     test_must_panic(t, func(){
-        r_data := json_data.Get("not-exists").MustBool()
-        assert.Equal(t, r_data, false)
+        json_data.Get("not-exists").MustBool()
     })
 
     // Get data as string
     test_must_panic(t, func(){
-        r_data := json_data.Get("not-exists").MustString()
-        assert.Equal(t, r_data, "")
+        json_data.Get("not-exists").MustString()
     })
 
     // Get data as float64
     test_must_panic(t, func(){
-        r_data := json_data.Get("not-exists").MustFloat64()
-        assert.Equal(t, r_data, float64(0))
+        json_data.Get("not-exists").MustFloat64()
     })
 
     // Get data as int
     test_must_panic(t, func(){
-        r_data := json_data.Get("not-exists").MustInt()
-        assert.Equal(t, r_data, int(0))
+        json_data.Get("not-exists").MustInt()
     })
 
     // Get data as int64
     test_must_panic(t, func(){
-        r_data := json_data.Get("not-exists").MustInt64()
-        assert.Equal(t, r_data, int64(0))
+        json_data.Get("not-exists").MustInt64()
     })
 
     // Get data as uint64
     test_must_panic(t, func(){
-        r_data := json_data.Get("not-exists").MustUint64()
-        assert.Equal(t, r_data, uint64(0))
+        json_data.Get("not-exists").MustUint64()
     })
 
     // Get data as string array
     test_must_panic(t, func(){
-        r_data := json_data.Get("not-exists").MustStringArray()
-        assert.Equal(t, r_data, []string{})
+        json_data.Get("not-exists").MustStringArray()
     })
 }
 
@@ -581,4 +574,23 @@ func Test_Get_Must_Assert_Data_W_Default(t *testing.T) {
     string_array_data := json_data.Get("not-exists").MustStringArray([]string{"i", "am", "ok"})
     assert.Equal(t, "[]string", fmt.Sprintf("%T", string_array_data))
     assert.Equal(t, string_array_data, []string{"i", "am", "ok"})
+}
+
+
+func Test_HTML_Escape(t *testing.T) {
+    // Init json and set html
+    json_data := New()
+    json_data.Set("param", "a=1&b=2&c=3")
+    json_data.Set("title", "<title>test escape</title>")
+
+    // dumps not escaped html
+    json_text, err := json_data.Dumps()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, json_text, `{"param":"a=1&b=2&c=3","title":"<title>test escape</title>"}`)
+
+    // dumps escaped html
+    json_data.SetHtmlEscape(true)
+    json_text, err = json_data.Dumps()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, json_text, `{"param":"a=1\u0026b=2\u0026c=3","title":"\u003ctitle\u003etest escape\u003c/title\u003e"}`)
 }
