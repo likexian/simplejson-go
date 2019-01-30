@@ -1,6 +1,6 @@
 # simplejson.go
 
-simplejson-go is a simple Go module for JSON parsing.
+simplejson-go is a simple and powerful Go module for JSON parsing.
 
 [![Build Status](https://secure.travis-ci.org/likexian/simplejson-go.png)](https://secure.travis-ci.org/likexian/simplejson-go)
 [![GoDoc](https://godoc.org/github.com/likexian/simplejson-go?status.svg)](https://godoc.org/github.com/likexian/simplejson-go)
@@ -40,7 +40,7 @@ Initialize the struct and set value
 
 Dump the struct data to JSON string
 
-    data_json := New(data_status)
+    data_json := simplejson.New(data_status)
     text, err := data_json.Dumps()
     if err == nil {
         // Get the text of JSON
@@ -49,11 +49,17 @@ Dump the struct data to JSON string
 
 Load the JSON string
 
-    data_json, err := Loads(text)
+    text := `{"Code": 1, "Message": "Ok", "Result": {"Student": [{"Name": "Li Kexian"}]}}`
+    data_json, err := simplejson.Loads(text)
     if err == nil {
-        // Get the value of JSON
-        fmt.Println(data_json.Get("Code").Int())
-        fmt.Println(data_json.Get("Message").String())
+        // Get the int value of JSON
+        int_code, err := data_json.Get("Code").Int()
+        fmt.Println(int_code, err)
+        // Get the string value of JSON
+        str_message, err := data_json.Get("Message").String()
+        fmt.Println(str_message, err)
+        // Magic get the string value of JSON with default
+        fmt.Println(data_json.Get("Result.Student.0.Name").MustString("-"))
     }
 
 ## LICENSE
