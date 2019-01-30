@@ -32,7 +32,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.8.5"
+    return "0.8.6"
 }
 
 
@@ -50,7 +50,8 @@ func License() string {
 
 // returns a pointer to a new Json object
 //   data_json := New()
-//   data_json := New(type Data struct{data string}{})
+//   data_json := New(type Data struct{data string}{"zzz"})
+//   data_json := New(map[string]interface{}{"iam": "Li Kexian"})
 func New(args ...interface{}) (*Json) {
     switch len(args) {
         case 1:
@@ -301,6 +302,25 @@ func (j *Json) GetN(i int) (*Json) {
     }
 
     return &Json{nil, j.escapeHtml}
+}
+
+
+// return len of json object
+//   return -1 if type invalid or error
+func (j *Json) Len() (int) {
+    if v, err := j.Map(); err == nil {
+        return len(v)
+    }
+
+    if v, err := j.Array(); err == nil {
+        return len(v)
+    }
+
+    if v, err := j.String(); err == nil {
+        return len(v)
+    }
+
+    return -1
 }
 
 

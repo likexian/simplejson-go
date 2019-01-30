@@ -666,3 +666,42 @@ func Test_Is_Array(t *testing.T) {
     is_map = json_data.Get("result.not-exists").IsArray()
     assert.Equal(t, is_map, false)
 }
+
+
+func Test_Len(t *testing.T) {
+    // Loads json for Set
+    json_data, err := Loads(text_result)
+    assert.Equal(t, err, nil)
+
+    // Get len of top level json
+    n := json_data.Len()
+    assert.Equal(t, n, 2)
+
+    // Get len of map
+    n = json_data.Get("status").Len()
+    assert.Equal(t, n, 2)
+
+    // Get len of not exists map
+    n = json_data.Get("status.not-exists").Len()
+    assert.Equal(t, n, -1)
+
+    // Get len of int
+    n = json_data.Get("status.code").Len()
+    assert.Equal(t, n, -1)
+
+    // Get len of string
+    n = json_data.Get("status.message").Len()
+    assert.Equal(t, n, 7)
+
+    // Get len of not exists string
+    n = json_data.Get("status.message.not-exists").Len()
+    assert.Equal(t, n, -1)
+
+    // Get len of array
+    n = json_data.Get("result.intlist").Len()
+    assert.Equal(t, n, 5)
+
+    // Get len of not exists array
+    n = json_data.Get("result.intlist.not-exists").Len()
+    assert.Equal(t, n, -1)
+}
