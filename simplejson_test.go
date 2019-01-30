@@ -604,3 +604,65 @@ func Test_HTML_Escape(t *testing.T) {
     assert.Equal(t, err, nil)
     assert.Equal(t, json_text, `{"param":"a=1\u0026b=2\u0026c=3","title":"\u003ctitle\u003etest escape\u003c/title\u003e"}`)
 }
+
+
+func Test_Is_Map(t *testing.T) {
+    // Loads json for Set
+    json_data, err := Loads(text_result)
+    assert.Equal(t, err, nil)
+
+    // Test the top level json
+    is_map := json_data.IsMap()
+    assert.Equal(t, is_map, true)
+
+    // Test after get
+    is_map = json_data.Get("status").IsMap()
+    assert.Equal(t, is_map, true)
+
+    // Test after twice get
+    is_map = json_data.Get("result").Get("online").IsMap()
+    assert.Equal(t, is_map, false)
+
+    // Test after magic get
+    is_map = json_data.Get("result.online").IsMap()
+    assert.Equal(t, is_map, false)
+
+    // Test the array
+    is_map = json_data.Get("result.intlist").IsMap()
+    assert.Equal(t, is_map, false)
+
+    // Test not exists key
+    is_map = json_data.Get("result.not-exists").IsMap()
+    assert.Equal(t, is_map, false)
+}
+
+
+func Test_Is_Array(t *testing.T) {
+    // Loads json for Set
+    json_data, err := Loads(text_result)
+    assert.Equal(t, err, nil)
+
+    // Test the top level json
+    is_map := json_data.IsArray()
+    assert.Equal(t, is_map, false)
+
+    // Test after get
+    is_map = json_data.Get("status").IsArray()
+    assert.Equal(t, is_map, false)
+
+    // Test after twice get
+    is_map = json_data.Get("result").Get("intlist").IsArray()
+    assert.Equal(t, is_map, true)
+
+    // Test the array
+    is_map = json_data.Get("result.intlist").IsArray()
+    assert.Equal(t, is_map, true)
+
+    // Test the array element
+    is_map = json_data.Get("result.intlist.0").IsArray()
+    assert.Equal(t, is_map, false)
+
+    // Test not exists key
+    is_map = json_data.Get("result.not-exists").IsArray()
+    assert.Equal(t, is_map, false)
+}

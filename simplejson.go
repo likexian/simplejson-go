@@ -32,7 +32,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.8.4"
+    return "0.8.5"
 }
 
 
@@ -301,6 +301,28 @@ func (j *Json) GetN(i int) (*Json) {
     }
 
     return &Json{nil, j.escapeHtml}
+}
+
+
+// return json object is a map
+func (j *Json) IsMap() (bool) {
+    switch j.data.(type) {
+        case map[string]interface{}:
+            return true
+        default:
+            return false
+    }
+}
+
+
+// return json object is an array
+func (j *Json) IsArray() (bool) {
+    switch j.data.(type) {
+        case []interface{}:
+            return true
+        default:
+            return false
+    }
 }
 
 
