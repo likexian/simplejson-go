@@ -93,6 +93,16 @@ func Test_New(t *testing.T) {
     json_text, err = json_data.Dumps()
     assert.Equal(t, err, nil)
     assert.Equal(t, json_text, text_result)
+
+    // pass init map to New
+    json_map := map[string]interface{}{"i": map[string]interface{}{"am": "Li Kexian", "age": 18}}
+    json_data = New(json_map)
+    json_text, err = json_data.Dumps()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, json_text, `{"i":{"age":18,"am":"Li Kexian"}}`)
+    name, err := json_data.Get("i").Get("am").String()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, name, "Li Kexian")
 }
 
 

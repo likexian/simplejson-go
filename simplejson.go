@@ -178,6 +178,37 @@ func (j *Json) Set(key string, value interface{}) {
 }
 
 
+// delete key-value from json object, dot(.) separated key is supported
+//   json.Del("status")
+//   json.Del("status.code")
+//   ! NOT SUPPORTED json.Del("result.intlist.3")
+func (j *Json) Del(key string) {
+    result, err := j.Map()
+    if err != nil {
+        return
+    }
+
+    ok := false
+    keys := strings.Split(key, ".")
+    for i:=0; i<len(keys)-1; i++  {
+        v := strings.TrimSpace(keys[i])
+        if v != "" {
+            if _, ok = result[v]; !ok {
+                return
+            }
+            result, ok = result[v].(map[string]interface{})
+            if !ok {
+                return
+            }
+        }
+    }
+
+    if _, ok := result[keys[len(keys) - 1]]; ok {
+        delete(result, keys[len(keys) - 1])
+    }
+}
+
+
 // check json object has key, dot(.) separated key is supported
 //   json.Has("status")
 //   json.Has("status.code")
@@ -220,37 +251,6 @@ func (j *Json) Has(key string) (bool) {
     }
 
     return false
-}
-
-
-// delete key-value from json object, dot(.) separated key is supported
-//   json.Del("status")
-//   json.Del("status.code")
-//   ! NOT SUPPORTED json.Del("result.intlist.3")
-func (j *Json) Del(key string) {
-    result, err := j.Map()
-    if err != nil {
-        return
-    }
-
-    ok := false
-    keys := strings.Split(key, ".")
-    for i:=0; i<len(keys)-1; i++  {
-        v := strings.TrimSpace(keys[i])
-        if v != "" {
-            if _, ok = result[v]; !ok {
-                return
-            }
-            result, ok = result[v].(map[string]interface{})
-            if !ok {
-                return
-            }
-        }
-    }
-
-    if _, ok := result[keys[len(keys) - 1]]; ok {
-        delete(result, keys[len(keys) - 1])
-    }
 }
 
 
