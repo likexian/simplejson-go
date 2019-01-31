@@ -33,7 +33,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.8.7"
+    return "0.9.0"
 }
 
 
@@ -412,22 +412,25 @@ func (j *Json) StringArray() (result []string, err error) {
 
 
 // returns as time.Time from json object
+//   optional args is to set the time string parsing format, time.RFC3339 by default
+//   if the time is of int, optional args must not set
 //   json.Time()
 //   json.Time("2006-01-02 15:04:05")
 func (j *Json) Time(args ...string) (result time.Time, err error) {
     switch j.data.(type) {
         case string:
+            if len(args) > 1 {
+                return result, errors.New("Too many arguments")
+            }
             r, e := j.String()
             if e != nil {
                 return result, e
             }
-            if len(args) == 0 {
-                return time.ParseInLocation(time.RFC3339, r, time.Local)
-            } else if len(args) == 1 {
-                return time.ParseInLocation(args[0], r, time.Local)
-            } else {
-                return result, errors.New("Too many arguments")
+            format := time.RFC3339
+            if len(args) == 1 && strings.TrimSpace(args[0]) != "" {
+                format = strings.TrimSpace(args[0])
             }
+            return time.ParseInLocation(format, r, time.Local)
         default:
             if len(args) > 0 {
                 return result, errors.New("Too many arguments")
@@ -566,6 +569,53 @@ func (j *Json) MustStringArray(args ...[]string) ([]string) {
 
     if len(args) == 1 {
         return args[0]
+    } else {
+        panic(err)
+    }
+}
+
+
+// returns as time.Time from json object
+//   if error return default(if set) or panic
+//   json.Time()                                                 // No format,  No default
+//   json.Time("2006-01-02 15:04:05")                            // Has format, No default
+//   json.Time(time.Unix(1548907870, 0))                         // No format,  Has default
+//   json.Time("2006-01-02 15:04:05", time.Unix(1548907870, 0))  // Has format, Has default
+func (j *Json) MustTime(args ...interface{}) (time.Time) {
+    if len(args) > 2 {
+        panic("Too many arguments")
+    }
+
+    format := ""
+    defset := false
+    var defbak time.Time
+
+    for i:=0; i<len(args); i++ {
+        switch args[i].(type) {
+            case string:
+                format = args[i].(string)
+            case time.Time:
+                defbak = args[i].(time.Time)
+                defset = true
+            default:
+                panic("Invalid argument type")
+        }
+    }
+
+    var r time.Time
+    var err error
+    if format != "" {
+        r, err = j.Time(format)
+    } else {
+        r, err = j.Time()
+    }
+
+    if err == nil {
+        return r
+    }
+
+    if defset {
+        return defbak
     } else {
         panic(err)
     }

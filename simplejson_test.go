@@ -708,7 +708,7 @@ func Test_Len(t *testing.T) {
 }
 
 
-func Test_Time(t *testing.T) {
+func Test_Time_Assert_Data(t *testing.T) {
     // Loads json for Set
     json_data, err := Loads(text_result)
     assert.Equal(t, err, nil)
@@ -767,6 +767,78 @@ func Test_Time(t *testing.T) {
     // Test get format date
     json_data.Set("time", "2019-01-31")
     time_data, err = json_data.Get("time").Time("2006-01-02")
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+}
+
+
+func Test_Time_Must_Assert_Data(t *testing.T) {
+    // Loads json for Set
+    json_data, err := Loads(text_result)
+    assert.Equal(t, err, nil)
+
+    // Time for comparing
+    test_time, err := time.Parse(time.RFC3339, "2019-01-31T12:11:10+08:00")
+    assert.Equal(t, err, nil)
+    assert.NotEqual(t, test_time.Unix(), int64(0))
+
+    // Test get rfc3339 time
+    json_data.Set("time", "2019-01-31T12:11:10+08:00")
+    time_data := json_data.Get("time").MustTime()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Test get format time
+    json_data.Set("time", "2019-01-31 12:11:10")
+    time_data = json_data.Get("time").MustTime("2006-01-02 15:04:05")
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // No format, no default
+    json_data.Set("time", "i-am-not-the-time")
+    test_must_panic(t, func(){
+        json_data.Get("time").MustTime()
+    })
+
+    // Has format, no default
+    test_must_panic(t, func(){
+        json_data.Get("time").MustTime("2006-01-02 15:04:05")
+    })
+
+    // No format, has default
+    time_data = json_data.Get("time").MustTime(time.Unix(1548907870, 0))
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Has format, has default
+    time_data = json_data.Get("time").MustTime("2006-01-02 15:04:05", time.Unix(1548907870, 0))
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // No format, no default, key not exists
+    test_must_panic(t, func(){
+        json_data.Get("not-exists").MustTime()
+    })
+
+    // No format, has default, key not exists
+    time_data = json_data.Get("not-exists").MustTime(time.Unix(1548907870, 0))
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Test must get time from int
+    json_data.Set("time", int(1548907870))
+    time_data = json_data.Get("time").MustTime()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Get from int, No default
+    json_data.Set("time", true)
+    test_must_panic(t, func(){
+        json_data.Get("time").MustTime()
+    })
+
+    // Get from int, Has default
+    time_data = json_data.Get("time").MustTime(time.Unix(1548907870, 0))
     assert.Equal(t, err, nil)
     assert.Equal(t, time_data, test_time)
 }
