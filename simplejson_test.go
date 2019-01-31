@@ -15,6 +15,7 @@ import (
     "fmt"
     "runtime"
     "encoding/json"
+    "time"
     "testing"
     "github.com/bmizerany/assert"
 )
@@ -704,4 +705,68 @@ func Test_Len(t *testing.T) {
     // Get len of not exists array
     n = json_data.Get("result.intlist.not-exists").Len()
     assert.Equal(t, n, -1)
+}
+
+
+func Test_Time(t *testing.T) {
+    // Loads json for Set
+    json_data, err := Loads(text_result)
+    assert.Equal(t, err, nil)
+
+    // Time for comparing
+    test_time, err := time.Parse(time.RFC3339, "2019-01-31T12:11:10+08:00")
+    assert.Equal(t, err, nil)
+    assert.NotEqual(t, test_time.Unix(), int64(0))
+
+    // Test get rfc3339 time
+    json_data.Set("time", "2019-01-31T12:11:10+08:00")
+    time_data, err := json_data.Get("time").Time()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Test get format time
+    json_data.Set("time", "2019-01-31 12:11:10")
+    time_data, err = json_data.Get("time").Time("2006-01-02 15:04:05")
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Test get rfc3339 time with not exists key
+    time_data, err = json_data.Get("not-exists").Time()
+    assert.NotEqual(t, err, nil)
+    assert.Equal(t, time_data.Unix(), int64(-62135596800))
+
+    // Test get time from int
+    json_data.Set("time", int(1548907870))
+    time_data, err = json_data.Get("time").Time()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Test get time from int64
+    json_data.Set("time", int64(1548907870))
+    time_data, err = json_data.Get("time").Time()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Test get time from uint64
+    json_data.Set("time", uint64(1548907870))
+    time_data, err = json_data.Get("time").Time()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Test get time from float64
+    json_data.Set("time", float64(1548907870))
+    time_data, err = json_data.Get("time").Time()
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
+
+    // Date for comparing
+    test_time, err = time.ParseInLocation("2006-01-02", "2019-01-31", time.Local)
+    assert.Equal(t, err, nil)
+    assert.NotEqual(t, test_time.Unix(), int64(0))
+
+    // Test get format date
+    json_data.Set("time", "2019-01-31")
+    time_data, err = json_data.Get("time").Time("2006-01-02")
+    assert.Equal(t, err, nil)
+    assert.Equal(t, time_data, test_time)
 }

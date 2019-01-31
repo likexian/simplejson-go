@@ -20,6 +20,7 @@ import (
     "reflect"
     "strings"
     "strconv"
+    "time"
 )
 
 
@@ -32,7 +33,7 @@ type Json struct {
 
 // returns package version
 func Version() string {
-    return "0.8.6"
+    return "0.8.7"
 }
 
 
@@ -404,6 +405,38 @@ func (j *Json) StringArray() (result []string, err error) {
             }
             result = append(result, r)
         }
+    }
+
+    return
+}
+
+
+// returns as time.Time from json object
+//   json.Time()
+//   json.Time("2006-01-02 15:04:05")
+func (j *Json) Time(args ...string) (result time.Time, err error) {
+    switch j.data.(type) {
+        case string:
+            r, e := j.String()
+            if e != nil {
+                return result, e
+            }
+            if len(args) == 0 {
+                return time.ParseInLocation(time.RFC3339, r, time.Local)
+            } else if len(args) == 1 {
+                return time.ParseInLocation(args[0], r, time.Local)
+            } else {
+                return result, errors.New("Too many arguments")
+            }
+        default:
+            if len(args) > 0 {
+                return result, errors.New("Too many arguments")
+            }
+            r, e := j.Int64()
+            if e != nil {
+                return result, e
+            }
+            return time.Unix(r, 0), nil
     }
 
     return
