@@ -306,8 +306,7 @@ func (j *Json) GetN(i int) (*Json) {
 }
 
 
-// return len of json object
-//   return -1 if type invalid or error
+// return len of json object, -1 if type invalid or error
 func (j *Json) Len() (int) {
     if v, err := j.Map(); err == nil {
         return len(v)
@@ -412,8 +411,8 @@ func (j *Json) StringArray() (result []string, err error) {
 
 
 // returns as time.Time from json object
-//   optional args is to set the time string parsing format, time.RFC3339 by default
-//   if the time is of int, optional args must not set
+// optional args is to set the time string parsing format, time.RFC3339 by default
+// if the time is of int, optional args must not set
 //   json.Time()
 //   json.Time("2006-01-02 15:04:05")
 func (j *Json) Time(args ...string) (result time.Time, err error) {
@@ -516,7 +515,7 @@ func (j *Json) Uint64() (result uint64, err error) {
 
 
 // returns as bool from json object with optional default value
-//   if error return default(if set) or panic
+// if error return default(if set) or panic
 func (j *Json) MustBool(args ...bool) (bool) {
     if len(args) > 1 {
         panic("Too many arguments")
@@ -536,7 +535,7 @@ func (j *Json) MustBool(args ...bool) (bool) {
 
 
 // returns as string from json object with optional default value
-//   if error return default(if set) or panic
+// if error return default(if set) or panic
 func (j *Json) MustString(args ...string) (string) {
     if len(args) > 1 {
         panic("Too many arguments")
@@ -556,7 +555,7 @@ func (j *Json) MustString(args ...string) (string) {
 
 
 // returns as string from json object with optional default value
-//   if error return default(if set) or panic
+// if error return default(if set) or panic
 func (j *Json) MustStringArray(args ...[]string) ([]string) {
     if len(args) > 1 {
         panic("Too many arguments")
@@ -576,7 +575,7 @@ func (j *Json) MustStringArray(args ...[]string) ([]string) {
 
 
 // returns as time.Time from json object
-//   if error return default(if set) or panic
+// if error return default(if set) or panic
 //   json.Time()                                                 // No format,  No default
 //   json.Time("2006-01-02 15:04:05")                            // Has format, No default
 //   json.Time(time.Unix(1548907870, 0))                         // No format,  Has default
@@ -623,7 +622,7 @@ func (j *Json) MustTime(args ...interface{}) (time.Time) {
 
 
 // returns as float64 from json object with optional default value
-//   if error return default(if set) or panic
+// if error return default(if set) or panic
 func (j *Json) MustFloat64(args ...float64) (float64) {
     if len(args) > 1 {
         panic("Too many arguments")
@@ -643,7 +642,7 @@ func (j *Json) MustFloat64(args ...float64) (float64) {
 
 
 // returns as int from json object with optional default value
-//   if error return default(if set) or panic
+// if error return default(if set) or panic
 func (j *Json) MustInt(args ...int) (int) {
     if len(args) > 1 {
         panic("Too many arguments")
@@ -663,7 +662,7 @@ func (j *Json) MustInt(args ...int) (int) {
 
 
 // returns as int64 from json object with optional default value
-//   if error return default(if set) or panic
+// if error return default(if set) or panic
 func (j *Json) MustInt64(args ...int64) (int64) {
     if len(args) > 1 {
         panic("Too many arguments")
@@ -683,7 +682,7 @@ func (j *Json) MustInt64(args ...int64) (int64) {
 
 
 // returns as uint64 from json object with optional default value
-//   if error return default(if set) or panic
+// if error return default(if set) or panic
 func (j *Json) MustUint64(args ...uint64) (uint64) {
     if len(args) > 1 {
         panic("Too many arguments")
