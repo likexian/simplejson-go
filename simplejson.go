@@ -24,32 +24,32 @@ import (
 )
 
 
-// storing json data
+// Json storing json data
 type Json struct {
     data        interface{}
     escapeHtml  bool
 }
 
 
-// returns package version
+// Version returns package version
 func Version() string {
     return "0.9.0"
 }
 
 
-// returns package author
+// Author returns package author
 func Author() string {
     return "[Li Kexian](https://www.likexian.com/)"
 }
 
 
-// returns package license
+// License returns package license
 func License() string {
     return "Apache License, Version 2.0"
 }
 
 
-// returns a pointer to a new Json object
+// New returns a pointer to a new Json object
 //   data_json := New()
 //   data_json := New(type Data struct{data string}{"zzz"})
 //   data_json := New(map[string]interface{}{"iam": "Li Kexian"})
@@ -67,13 +67,13 @@ func New(args ...interface{}) (*Json) {
 }
 
 
-// set html escape for escaping of <, >, and & in JSON strings
+// SetHtmlEscape set html escape for escaping of <, >, and & in JSON strings
 func (j *Json) SetHtmlEscape(escape bool) {
     j.escapeHtml = escape
 }
 
 
-// loads data from a file, returns a json object
+// Load loads data from a file, returns a json object
 func Load(file string) (j *Json, err error) {
     data, err := ioutil.ReadFile(file)
     if err != nil {
@@ -87,7 +87,7 @@ func Load(file string) (j *Json, err error) {
 }
 
 
-// dumps json object to a file
+// Dump dumps json object to a file
 func (j *Json) Dump(file string) (bytes int, err error) {
     result, err := j.PrettyDumps()
     if err != nil {
@@ -106,7 +106,7 @@ func (j *Json) Dump(file string) (bytes int, err error) {
 }
 
 
-// unmarshal json from string, returns json object
+// Loads unmarshal json from string, returns json object
 func Loads(text string) (j *Json, err error) {
     j = new(Json)
 
@@ -118,13 +118,13 @@ func Loads(text string) (j *Json, err error) {
 }
 
 
-// marshal json object to string
+// Dumps marshal json object to string
 func (j *Json) Dumps() (result string, err error) {
     return j.doDumps("")
 }
 
 
-// marshal json object to string, with identation
+// PrettyDumps marshal json object to string, with identation
 func (j *Json) PrettyDumps() (result string, err error) {
     return j.doDumps(strings.Repeat(" ", 4))
 }
@@ -149,7 +149,7 @@ func (j *Json) doDumps(indent string) (result string, err error) {
 }
 
 
-// set key-value to json object, dot(.) separated key is supported
+// Set set key-value to json object, dot(.) separated key is supported
 //   json.Set("status", 1)
 //   json.Set("status.code", 1)
 //   ! NOT SUPPORTED json.Set("result.intlist.3", 666)
@@ -180,7 +180,7 @@ func (j *Json) Set(key string, value interface{}) {
 }
 
 
-// delete key-value from json object, dot(.) separated key is supported
+// Del delete key-value from json object, dot(.) separated key is supported
 //   json.Del("status")
 //   json.Del("status.code")
 //   ! NOT SUPPORTED json.Del("result.intlist.3")
@@ -211,7 +211,7 @@ func (j *Json) Del(key string) {
 }
 
 
-// check json object has key, dot(.) separated key is supported
+// Has check json object has key, dot(.) separated key is supported
 //   json.Has("status")
 //   json.Has("status.code")
 //   json.Has("result.intlist.3")
@@ -256,7 +256,7 @@ func (j *Json) Has(key string) (bool) {
 }
 
 
-// returns the pointer to json object by key, dot(.) separated key is supported
+// Get returns the pointer to json object by key, dot(.) separated key is supported
 //   json.Get("status").Int()
 //   json.Get("status.code").Int()
 //   json.Get("result.intlist.3").Int()
@@ -292,7 +292,7 @@ func (j *Json) Get(key string) (*Json) {
 }
 
 
-// returns a pointer to the index of json object
+// GetN returns a pointer to the index of json object
 //   json.Get("int_list").GetN(1).Int()
 func (j *Json) GetN(i int) (*Json) {
     data, err := j.Array()
@@ -306,7 +306,7 @@ func (j *Json) GetN(i int) (*Json) {
 }
 
 
-// return len of json object, -1 if type invalid or error
+// Len returns len of json object, -1 if type invalid or error
 func (j *Json) Len() (int) {
     if v, err := j.Map(); err == nil {
         return len(v)
@@ -324,7 +324,7 @@ func (j *Json) Len() (int) {
 }
 
 
-// return json object is a map
+// IsMap returns json object is a map
 func (j *Json) IsMap() (bool) {
     switch j.data.(type) {
         case map[string]interface{}:
@@ -335,7 +335,7 @@ func (j *Json) IsMap() (bool) {
 }
 
 
-// return json object is an array
+// IsArray returns json object is an array
 func (j *Json) IsArray() (bool) {
     switch j.data.(type) {
         case []interface{}:
@@ -346,7 +346,7 @@ func (j *Json) IsArray() (bool) {
 }
 
 
-// returns as map from json object
+// Map returns as map from json object
 func (j *Json) Map() (result map[string]interface{}, err error) {
     result, ok := (j.data).(map[string]interface{})
     if !ok {
@@ -356,7 +356,7 @@ func (j *Json) Map() (result map[string]interface{}, err error) {
 }
 
 
-// returns as array from json object
+// Array returns as array from json object
 func (j *Json) Array() (result []interface{}, err error) {
     result, ok := (j.data).([]interface{})
     if !ok {
@@ -366,7 +366,7 @@ func (j *Json) Array() (result []interface{}, err error) {
 }
 
 
-// returns as bool from json object
+// Bool returns as bool from json object
 func (j *Json) Bool() (result bool, err error) {
     result, ok := (j.data).(bool)
     if !ok {
@@ -376,7 +376,7 @@ func (j *Json) Bool() (result bool, err error) {
 }
 
 
-// returns as string from json object
+// String returns as string from json object
 func (j *Json) String() (result string, err error) {
     result, ok := (j.data).(string)
     if !ok {
@@ -386,7 +386,7 @@ func (j *Json) String() (result string, err error) {
 }
 
 
-// returns as string array from json object
+// StringArray returns as string array from json object
 func (j *Json) StringArray() (result []string, err error) {
     data, err := j.Array()
     if err != nil {
@@ -410,7 +410,7 @@ func (j *Json) StringArray() (result []string, err error) {
 }
 
 
-// returns as time.Time from json object
+// Time returns as time.Time from json object
 // optional args is to set the time string parsing format, time.RFC3339 by default
 // if the time is of int, optional args must not set
 //   json.Time()
@@ -443,7 +443,7 @@ func (j *Json) Time(args ...string) (result time.Time, err error) {
 }
 
 
-// returns as float64 from json object
+// Float64 returns as float64 from json object
 func (j *Json) Float64() (result float64, err error) {
     switch j.data.(type) {
         case json.Number:
@@ -460,7 +460,7 @@ func (j *Json) Float64() (result float64, err error) {
 }
 
 
-// returns as int from json object
+// Int returns as int from json object
 func (j *Json) Int() (result int, err error) {
     switch j.data.(type) {
         case json.Number:
@@ -478,7 +478,7 @@ func (j *Json) Int() (result int, err error) {
 }
 
 
-// returns as int64 from json object
+// Int64 returns as int64 from json object
 func (j *Json) Int64() (result int64, err error) {
     switch j.data.(type) {
         case json.Number:
@@ -495,7 +495,7 @@ func (j *Json) Int64() (result int64, err error) {
 }
 
 
-// returns as uint64 from json object
+// Uint64 returns as uint64 from json object
 func (j *Json) Uint64() (result uint64, err error) {
     switch j.data.(type) {
         case json.Number:
@@ -512,7 +512,7 @@ func (j *Json) Uint64() (result uint64, err error) {
 }
 
 
-// returns as bool from json object with optional default value
+// MustBool returns as bool from json object with optional default value
 // if error return default(if set) or panic
 func (j *Json) MustBool(args ...bool) (bool) {
     if len(args) > 1 {
@@ -526,13 +526,13 @@ func (j *Json) MustBool(args ...bool) (bool) {
 
     if len(args) == 1 {
         return args[0]
-    } else {
-        panic(err)
     }
+
+    panic(err)
 }
 
 
-// returns as string from json object with optional default value
+// MustString returns as string from json object with optional default value
 // if error return default(if set) or panic
 func (j *Json) MustString(args ...string) (string) {
     if len(args) > 1 {
@@ -546,13 +546,13 @@ func (j *Json) MustString(args ...string) (string) {
 
     if len(args) == 1 {
         return args[0]
-    } else {
-        panic(err)
     }
+
+    panic(err)
 }
 
 
-// returns as string from json object with optional default value
+// MustStringArray returns as string from json object with optional default value
 // if error return default(if set) or panic
 func (j *Json) MustStringArray(args ...[]string) ([]string) {
     if len(args) > 1 {
@@ -566,13 +566,13 @@ func (j *Json) MustStringArray(args ...[]string) ([]string) {
 
     if len(args) == 1 {
         return args[0]
-    } else {
-        panic(err)
     }
+
+    panic(err)
 }
 
 
-// returns as time.Time from json object
+// MustTime returns as time.Time from json object
 // if error return default(if set) or panic
 //   json.Time()                                                 // No format,  No default
 //   json.Time("2006-01-02 15:04:05")                            // Has format, No default
@@ -613,13 +613,13 @@ func (j *Json) MustTime(args ...interface{}) (time.Time) {
 
     if defset {
         return defbak
-    } else {
-        panic(err)
     }
+
+    panic(err)
 }
 
 
-// returns as float64 from json object with optional default value
+// MustFloat64 returns as float64 from json object with optional default value
 // if error return default(if set) or panic
 func (j *Json) MustFloat64(args ...float64) (float64) {
     if len(args) > 1 {
@@ -633,13 +633,13 @@ func (j *Json) MustFloat64(args ...float64) (float64) {
 
     if len(args) == 1 {
         return args[0]
-    } else {
-        panic(err)
     }
+
+    panic(err)
 }
 
 
-// returns as int from json object with optional default value
+// MustInt returns as int from json object with optional default value
 // if error return default(if set) or panic
 func (j *Json) MustInt(args ...int) (int) {
     if len(args) > 1 {
@@ -653,13 +653,13 @@ func (j *Json) MustInt(args ...int) (int) {
 
     if len(args) == 1 {
         return args[0]
-    } else {
-        panic(err)
     }
+
+    panic(err)
 }
 
 
-// returns as int64 from json object with optional default value
+// MustInt64 returns as int64 from json object with optional default value
 // if error return default(if set) or panic
 func (j *Json) MustInt64(args ...int64) (int64) {
     if len(args) > 1 {
@@ -673,13 +673,13 @@ func (j *Json) MustInt64(args ...int64) (int64) {
 
     if len(args) == 1 {
         return args[0]
-    } else {
-        panic(err)
     }
+
+    panic(err)
 }
 
 
-// returns as uint64 from json object with optional default value
+// MustUint64 returns as uint64 from json object with optional default value
 // if error return default(if set) or panic
 func (j *Json) MustUint64(args ...uint64) (uint64) {
     if len(args) > 1 {
@@ -693,7 +693,7 @@ func (j *Json) MustUint64(args ...uint64) (uint64) {
 
     if len(args) == 1 {
         return args[0]
-    } else {
-        panic(err)
     }
+
+    panic(err)
 }
