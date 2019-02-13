@@ -190,7 +190,7 @@ func (j *Json) Del(key string) {
         return
     }
 
-    ok := false
+    var ok bool
     keys := strings.Split(key, ".")
     for i:=0; i<len(keys)-1; i++  {
         v := strings.TrimSpace(keys[i])
@@ -440,8 +440,6 @@ func (j *Json) Time(args ...string) (result time.Time, err error) {
             }
             return time.Unix(r, 0), nil
     }
-
-    return
 }
 
 

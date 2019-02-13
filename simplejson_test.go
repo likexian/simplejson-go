@@ -175,7 +175,7 @@ func Test_Set_Has_Get_Del(t *testing.T) {
     assert.Equal(t, json_link, r_link)
 
     // Get the not-exists key
-    r_name, err = json_data.Get("not-exists").String()
+    _, err = json_data.Get("not-exists").String()
     assert.NotEqual(t, err, nil)
 
     // Del key-value
@@ -218,9 +218,9 @@ func Test_Set_Has_Get_Del_W_Dot(t *testing.T) {
     assert.Equal(t, json_name, r_name)
 
     // Get the not exists key
-    r_name, err = json_data.Get("i.am.that.what").String()
+    _, err = json_data.Get("i.am.that.what").String()
     assert.NotEqual(t, err, nil)
-    r_name, err = json_data.Get("i.am.this.who").String()
+    _, err = json_data.Get("i.am.this.who").String()
     assert.NotEqual(t, err, nil)
 
     // Get the Set name value with origin way
@@ -229,7 +229,7 @@ func Test_Set_Has_Get_Del_W_Dot(t *testing.T) {
     assert.Equal(t, json_name, r_name)
 
     // Get the not exists key
-    r_name, err = json_data.Get("i").Get("am").Get("that").Get("what").String()
+    _, err = json_data.Get("i").Get("am").Get("that").Get("what").String()
     assert.NotEqual(t, err, nil)
 
     // Del key-value
@@ -285,9 +285,9 @@ func Test_Set_Has_Get_Del_W_List(t *testing.T) {
     int_data, err := json_data.Get("that.is.a.dict.in.list.0.b").Int()
     assert.Equal(t, err, nil)
     assert.Equal(t, int_data, 2)
-    int_data, err = json_data.Get("that.is.a.dict.in.list.1.b").Int()
+    _, err = json_data.Get("that.is.a.dict.in.list.1.b").Int()
     assert.NotEqual(t, err, nil)
-    int_data, err = json_data.Get("that.is.a.dict.in.list.0.z").Int()
+    _, err = json_data.Get("that.is.a.dict.in.list.0.z").Int()
     assert.NotEqual(t, err, nil)
 
     // Get the list value
@@ -296,7 +296,7 @@ func Test_Set_Has_Get_Del_W_List(t *testing.T) {
     assert.Equal(t, r_number, 3)
 
     // Get not-exists N
-    r_number, err = json_data.Get("that.is.a.list.666").Int()
+    _, err = json_data.Get("that.is.a.list.666").Int()
     assert.NotEqual(t, err, nil)
 
     // Get the list value with origin way
@@ -315,7 +315,7 @@ func Test_Set_Has_Get_Del_W_List(t *testing.T) {
     assert.Equal(t, r_number, 2)
 
     // Get not-exists N with origin way GetN
-    r_number, err = json_data.Get("that").Get("is").Get("a").Get("list").GetN(666).Int()
+    _, err = json_data.Get("that").Get("is").Get("a").Get("list").GetN(666).Int()
     assert.NotEqual(t, err, nil)
 }
 
