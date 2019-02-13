@@ -13,7 +13,7 @@ This module provides the most friendly way to use JSON in golang.
 
 ## Installation
 
-    go get github.com/likexian/simplejson-go
+    go get -u github.com/likexian/simplejson-go
 
 ## Importing
 
@@ -27,41 +27,33 @@ Visit the docs on [GoDoc](https://godoc.org/github.com/likexian/simplejson-go)
 
 ## Example
 
-The struct for storing data
+Dump the struct data to JSON string
 
     type Status struct {
         Code    int64  `json:"code"`
         Message string `json:"message"`
     }
 
-Initialize the struct and set value
+    statusData := Status{}
+    statusData.Code = 1
+    statusData.Message = "Success"
 
-    data_status := Status{}
-    data_status.Code = 1
-    data_status.Message = "success"
-
-Dump the struct data to JSON string
-
-    data_json := simplejson.New(data_status)
-    text, err := data_json.Dumps()
+    jsonData := simplejson.New(statusData)
+    jsonText, err := jsonData.Dumps()
     if err == nil {
         // Get the text of JSON
-        fmt.Println(text)
+        fmt.Println(jsonText)
     }
 
 Load the JSON string
 
-    text := `{"Code": 1, "Message": "Ok", "Result": {"Student": [{"Name": "Li Kexian"}]}}`
-    data_json, err := simplejson.Loads(text)
+    text := `{"Code": 1, "Message": "Success", "Result": {"Student": [{"Name": "Li Kexian"}]}}`
+    jsonData, err := simplejson.Loads(text)
     if err == nil {
-        // Get the int value of JSON
-        int_code, err := data_json.Get("Code").Int()
-        fmt.Println(int_code, err)
-        // Get the string value of JSON
-        str_message, err := data_json.Get("Message").String()
-        fmt.Println(str_message, err)
-        // Magic get the string value of JSON with default
-        fmt.Println(data_json.Get("Result.Student.0.Name").MustString("-"))
+        // Get the value of JSON
+        fmt.Println(jsonData.Get("Code").Int())
+        fmt.Println(jsonData.Get("Message").String())
+        fmt.Println(jsonData.Get("Result.Student.0.Name").MustString("-"))
     }
 
 ## LICENSE
