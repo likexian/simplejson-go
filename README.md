@@ -1,6 +1,6 @@
 # simplejson.go
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/likexian/simplejson-go/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![GoDoc](https://godoc.org/github.com/likexian/simplejson-go?status.svg)](https://godoc.org/github.com/likexian/simplejson-go)
 [![Build Status](https://travis-ci.org/likexian/simplejson-go.svg?branch=master)](https://travis-ci.org/likexian/simplejson-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/likexian/simplejson-go)](https://goreportcard.com/report/github.com/likexian/simplejson-go)
