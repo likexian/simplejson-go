@@ -13,9 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io"
-	"io/ioutil"
-	"os"
+	"github.com/likexian/gokit/xfile"
 	"reflect"
 	"strconv"
 	"strings"
@@ -30,7 +28,7 @@ type Json struct {
 
 // Version returns package version
 func Version() string {
-	return "0.9.4"
+	return "0.9.5"
 }
 
 // Author returns package author
@@ -65,35 +63,24 @@ func (j *Json) SetHtmlEscape(escape bool) {
 	j.escapeHtml = escape
 }
 
-// Load loads data from a file, returns a json object
-func Load(file string) (j *Json, err error) {
-	data, err := ioutil.ReadFile(file)
+// Load loads data from file, returns a json object
+func Load(path string) (j *Json, err error) {
+	text, err := xfile.ReadText(path)
 	if err != nil {
 		return
 	}
 
-	text := string(data)
-	j, err = Loads(text)
-
-	return
+	return Loads(text)
 }
 
 // Dump dumps json object to a file
-func (j *Json) Dump(file string) (bytes int, err error) {
+func (j *Json) Dump(path string) (err error) {
 	result, err := j.PrettyDumps()
 	if err != nil {
 		return
 	}
 
-	fd, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
-	if err != nil {
-		return
-	}
-
-	bytes, err = io.WriteString(fd, result)
-	fd.Close()
-
-	return
+	return xfile.WriteText(path, result)
 }
 
 // Loads unmarshal json from string, returns json object

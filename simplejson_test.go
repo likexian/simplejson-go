@@ -109,9 +109,8 @@ func Test_Load_Dump(t *testing.T) {
 	assert.Equal(t, jsonText, textResult)
 
 	// Dump json to file
-	b, err := jsonData.Dump(textFile)
+	err = jsonData.Dump(textFile)
 	assert.Equal(t, err, nil)
-	assert.Equal(t, b, 246)
 
 	// Load json from file
 	jsonData, err = Load(textFile)
@@ -147,7 +146,7 @@ func Test_Set_Has_Get_Del(t *testing.T) {
 	jsonData.Set("link", jsonLink)
 
 	// Test dumpable
-	_, err = jsonData.Dump(textFile)
+	err = jsonData.Dump(textFile)
 	assert.Equal(t, err, nil)
 
 	// Test Set key-value
@@ -194,7 +193,7 @@ func Test_Set_Has_Get_Del_W_Dot(t *testing.T) {
 	jsonData.Set("link", jsonLink)
 
 	// Test dumpable
-	_, err = jsonData.Dump(textFile)
+	err = jsonData.Dump(textFile)
 	assert.Equal(t, err, nil)
 
 	// Test Set key-value
