@@ -12,7 +12,7 @@ package simplejson
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bmizerany/assert"
+	"github.com/likexian/gokit/assert"
 	"os"
 	"runtime"
 	"testing"
