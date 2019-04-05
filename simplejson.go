@@ -38,7 +38,7 @@ type Json struct {
 
 // Version returns package version
 func Version() string {
-	return "0.9.6"
+	return "0.10.0"
 }
 
 // Author returns package author
@@ -68,19 +68,52 @@ func New(args ...interface{}) *Json {
 	}
 }
 
-// SetHtmlEscape set html escape for escaping of <, >, and & in JSON strings
-func (j *Json) SetHtmlEscape(escape bool) {
-	j.escapeHtml = escape
+// Load loads data from file, returns a json object
+func Load(path string) (*Json, error) {
+	j := New()
+	err := j.Load(path)
+	return j, err
+}
+
+// Loads unmarshal json from string, returns json object
+func Loads(text string) (*Json, error) {
+	j := New()
+	err := j.Loads(text)
+	return j, err
+}
+
+// Dump dumps json object to a file
+func Dump(path string, data interface{}) error {
+	return New(data).Dump(path)
+}
+
+// Dumps marshal json object to string
+func Dumps(data interface{}) (string, error) {
+	return New(data).Dumps()
+}
+
+// PrettyDumps marshal json object to string, with identation
+func PrettyDumps(data interface{}) (string, error) {
+	return New(data).PrettyDumps()
 }
 
 // Load loads data from file, returns a json object
-func Load(path string) (j *Json, err error) {
+func (j *Json) Load(path string) error {
 	text, err := xfile.ReadText(path)
 	if err != nil {
-		return
+		return err
 	}
 
-	return Loads(text)
+	return j.Loads(text)
+}
+
+// Loads unmarshal json from string, returns json object
+func (j *Json) Loads(text string) error {
+	dec := json.NewDecoder(bytes.NewBuffer([]byte(text)))
+	dec.UseNumber()
+	err := dec.Decode(&j.data)
+
+	return err
 }
 
 // Dump dumps json object to a file
@@ -91,17 +124,6 @@ func (j *Json) Dump(path string) (err error) {
 	}
 
 	return xfile.WriteText(path, result)
-}
-
-// Loads unmarshal json from string, returns json object
-func Loads(text string) (j *Json, err error) {
-	j = new(Json)
-
-	dec := json.NewDecoder(bytes.NewBuffer([]byte(text)))
-	dec.UseNumber()
-	err = dec.Decode(&j.data)
-
-	return
 }
 
 // Dumps marshal json object to string
@@ -130,6 +152,11 @@ func (j *Json) doDumps(indent string) (result string, err error) {
 	result = strings.TrimSpace(result)
 
 	return
+}
+
+// SetHtmlEscape set html escape for escaping of <, >, and & in JSON strings
+func (j *Json) SetHtmlEscape(escape bool) {
+	j.escapeHtml = escape
 }
 
 // Set set key-value to json object, dot(.) separated key is supported

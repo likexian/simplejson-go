@@ -48,7 +48,7 @@ type Status struct {
 var (
 	jsonResult = JsonResult{}
 	textResult = `{"result":{"intlist":[0,1,2,3,4],"online":true,"rate":0.8},"status":{"code":1,"message":"success"}}`
-	textFile   = "example/simplejson.json"
+	textFile   = "simplejson.json"
 	jsonName   = "Li Kexian"
 	jsonLink   = "https://www.likexian.com/"
 )
@@ -69,7 +69,7 @@ func testMustPanic(t *testing.T, testFunc func()) {
 }
 
 func init() {
-	_ = os.Remove(textFile)
+	os.Remove(textFile)
 
 	dataResult := Result{}
 	dataResult.IntList = []int64{0, 1, 2, 3, 4}
@@ -109,40 +109,65 @@ func Test_New(t *testing.T) {
 }
 
 func Test_Load_Dump(t *testing.T) {
+	defer os.Remove(textFile)
+
 	// Loads json from text
-	jsonData, err := Loads(textResult)
+	j, err := Loads(textResult)
 	assert.Equal(t, err, nil)
+	code, err := j.Get("status.code").Int()
+	assert.Nil(t, err)
+	assert.Equal(t, code, 1)
 
 	// Dumps json to text
-	jsonText, err := jsonData.Dumps()
-	assert.Equal(t, err, nil)
-	assert.Equal(t, jsonText, textResult)
+	s, err := Dumps(jsonResult)
+	assert.Nil(t, err)
+	assert.Equal(t, s, textResult)
+
+	// PrettyDumps json to text
+	s, err = PrettyDumps(jsonResult)
+	assert.Nil(t, err)
+	assert.NotEqual(t, s, textResult)
 
 	// Dump json to file
-	err = jsonData.Dump(textFile)
-	assert.Equal(t, err, nil)
+	err = Dump(textFile, jsonResult)
+	assert.Nil(t, err)
 
 	// Load json from file
-	jsonData, err = Load(textFile)
-	assert.Equal(t, err, nil)
+	j, err = Load(textFile)
+	assert.Nil(t, err)
+	code, err = j.Get("status.code").Int()
+	assert.Nil(t, err)
+	assert.Equal(t, code, 1)
+}
 
-	// Dumps json to text
-	jsonText, err = jsonData.Dumps()
-	assert.Equal(t, err, nil)
-	assert.Equal(t, jsonText, textResult)
+func Test_J_Load_Dump(t *testing.T) {
+	defer os.Remove(textFile)
 
-	// Dumps json to text in pretty way
-	jsonText, err = jsonData.PrettyDumps()
-	assert.Equal(t, err, nil)
-	assert.Equal(t, len(jsonText), 246)
-	assert.NotEqual(t, jsonText, textResult)
+	j := New()
 
-	// Loads json from text of pretty
-	jsonData, err = Loads(jsonText)
-	assert.Equal(t, err, nil)
+	err := j.Loads(textResult)
+	assert.Nil(t, err)
+	code, err := j.Get("status.code").Int()
+	assert.Nil(t, err)
+	assert.Equal(t, code, 1)
+
+	s, err := j.Dumps()
+	assert.Nil(t, err)
+	assert.Equal(t, s, textResult)
+
+	err = j.Dump(textFile)
+	assert.Nil(t, err)
+
+	err = j.Load(textFile)
+	assert.Nil(t, err)
+	code, err = j.Get("status.code").Int()
+	assert.Nil(t, err)
+	assert.Equal(t, code, 1)
 }
 
 func Test_Set_Has_Get_Del(t *testing.T) {
+	defer os.Remove(textFile)
+
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
 	assert.Equal(t, err, nil)
@@ -189,6 +214,8 @@ func Test_Set_Has_Get_Del(t *testing.T) {
 }
 
 func Test_Set_Has_Get_Del_W_Dot(t *testing.T) {
+	defer os.Remove(textFile)
+
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
 	assert.Equal(t, err, nil)
