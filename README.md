@@ -27,34 +27,46 @@ Visit the docs on [GoDoc](https://godoc.org/github.com/likexian/simplejson-go)
 
 ## Example
 
-Dump the struct data to JSON string
+### Dump the struct data to JSON string
 
-    type Status struct {
-        Code    int64  `json:"code"`
-        Message string `json:"message"`
-    }
+```go
+// Define Status struct
+type Status struct {
+    Code    int64  `json:"code"`
+    Message string `json:"message"`
+}
 
-    statusData := Status{}
-    statusData.Code = 1
-    statusData.Message = "Success"
+// Init status
+status := Status{1, "Success"}
 
-    jsonData := simplejson.New(statusData)
-    jsonText, err := jsonData.Dumps()
-    if err == nil {
-        // Get the text of JSON
-        fmt.Println(jsonText)
-    }
+// Dump status to json string
+j := simplejson.New(status)
+s, err := j.Dumps()
+if err == nil {
+    fmt.Println("Json text is:", s)
+}
 
-Load the JSON string
+// OR Use the simple way
+s, err := simplejson.Dumps(status)
+if err == nil {
+    fmt.Println("Json text is:", s)
+}
+```
 
-    text := `{"Code": 1, "Message": "Success", "Result": {"Student": [{"Name": "Li Kexian"}]}}`
-    jsonData, err := simplejson.Loads(text)
-    if err == nil {
-        // Get the value of JSON
-        fmt.Println(jsonData.Get("Code").Int())
-        fmt.Println(jsonData.Get("Message").String())
-        fmt.Println(jsonData.Get("Result.Student.0.Name").MustString("-"))
-    }
+### Load the JSON string
+
+```go
+// Json strig
+text := `{"Code": 1, "Message": "Success", "Result": {"Student": [{"Name": "Li Kexian"}]}}`
+
+// Load json string
+j, err := simplejson.Loads(text)
+if err == nil {
+    fmt.Println("Code is:", j.Get("Code").MustInt(0))
+    fmt.Println("Message is:", j.Get("Message").MustString(""))
+    fmt.Println("First Student name is:", j.Get("Result.Student.0.Name").MustString("-"))
+}
+```
 
 ## LICENSE
 
