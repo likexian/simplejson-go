@@ -38,7 +38,7 @@ type Json struct {
 
 // Version returns package version
 func Version() string {
-	return "0.10.0"
+	return "0.10.1"
 }
 
 // Author returns package author
@@ -418,15 +418,11 @@ func (j *Json) Time(args ...string) (result time.Time, err error) {
 		if len(args) > 1 {
 			return result, errors.New("Too many arguments")
 		}
-		r, e := j.String()
-		if e != nil {
-			return result, e
-		}
 		format := time.RFC3339
 		if len(args) == 1 && strings.TrimSpace(args[0]) != "" {
 			format = strings.TrimSpace(args[0])
 		}
-		return time.ParseInLocation(format, r, time.Local)
+		return time.ParseInLocation(format, j.data.(string), time.Local)
 	default:
 		if len(args) > 0 {
 			return result, errors.New("Too many arguments")
