@@ -147,6 +147,9 @@ func Test_Load_Dump(t *testing.T) {
 
 	_, err = Load("not-exists")
 	assert.NotNil(t, err)
+
+	err = New(make(chan int)).Dump(textFile)
+	assert.NotNil(t, err)
 }
 
 func Test_J_Load_Dump(t *testing.T) {
@@ -938,6 +941,9 @@ func Test_Time_Must_Assert_Data(t *testing.T) {
 	})
 	testMustPanic(t, func() {
 		jsonData.Get("not-exists").MustTime(1)
+	})
+	testMustPanic(t, func() {
+		jsonData.Get("not-exists").MustTime(1, 1, 1)
 	})
 
 	// No format, has default, key not exists
