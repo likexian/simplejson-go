@@ -361,18 +361,18 @@ func Test_Set_Has_Get_Del_W_List(t *testing.T) {
 	assert.Equal(t, err, nil)
 	assert.Equal(t, rNumber, 4)
 
-	// Get the list value with GetN
-	rNumber, err = jsonData.Get("that.is.a.list").GetN(1).Int()
+	// Get the list value with Index
+	rNumber, err = jsonData.Get("that.is.a.list").Index(1).Int()
 	assert.Equal(t, err, nil)
 	assert.Equal(t, rNumber, 1)
 
-	// Get the list value with origin way GetN
-	rNumber, err = jsonData.Get("that").Get("is").Get("a").Get("list").GetN(2).Int()
+	// Get the list value with origin way Index
+	rNumber, err = jsonData.Get("that").Get("is").Get("a").Get("list").Index(2).Int()
 	assert.Equal(t, err, nil)
 	assert.Equal(t, rNumber, 2)
 
-	// Get not-exists N with origin way GetN
-	_, err = jsonData.Get("that").Get("is").Get("a").Get("list").GetN(666).Int()
+	// Get not-exists N with origin way Index
+	_, err = jsonData.Get("that").Get("is").Get("a").Get("list").Index(666).Int()
 	assert.NotEqual(t, err, nil)
 }
 

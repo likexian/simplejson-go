@@ -47,7 +47,26 @@ if err == nil {
     fmt.Println("Json text is:", s)
 }
 
-// OR Use the simple way
+// OR dumps using the easy way
+s, err := simplejson.Dumps(status)
+if err == nil {
+    fmt.Println("Json text is:", s)
+}
+```
+
+### Dump the map data to JSON string
+
+```go
+// Init a map data
+data := map[string]interface{}{
+    "code": 1,
+    "message": "success",
+    "result": {
+        "Name": "Li Kexian"
+    }
+}
+
+// Dump to string in the easy way
 s, err := simplejson.Dumps(status)
 if err == nil {
     fmt.Println("Json text is:", s)

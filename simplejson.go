@@ -38,7 +38,7 @@ type Json struct {
 
 // Version returns package version
 func Version() string {
-	return "0.10.1"
+	return "0.11.0"
 }
 
 // Author returns package author
@@ -252,7 +252,7 @@ func (j *Json) Has(key string) bool {
 					if i == len(keys)-1 {
 						return true
 					}
-					result = result.GetN(n)
+					result = result.Index(n)
 				} else {
 					return false
 				}
@@ -287,7 +287,7 @@ func (j *Json) Get(key string) *Json {
 					if err != nil {
 						return &Json{nil, j.escapeHtml}
 					}
-					result = result.GetN(i)
+					result = result.Index(i)
 				} else {
 					return &Json{nil, j.escapeHtml}
 				}
@@ -298,9 +298,9 @@ func (j *Json) Get(key string) *Json {
 	return result
 }
 
-// GetN returns a pointer to the index of json object
-//   json.Get("int_list").GetN(1).Int()
-func (j *Json) GetN(i int) *Json {
+// Index returns a pointer to the index of json object
+//   json.Get("int_list").Index(1).Int()
+func (j *Json) Index(i int) *Json {
 	data, err := j.Array()
 	if err == nil {
 		if len(data) > i {
