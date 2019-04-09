@@ -38,7 +38,7 @@ type Json struct {
 
 // Version returns package version
 func Version() string {
-	return "0.11.0"
+	return "0.12.0"
 }
 
 // Author returns package author
@@ -498,6 +498,44 @@ func (j *Json) Uint64() (result uint64, err error) {
 	default:
 		return 0, errors.New("invalid value type")
 	}
+}
+
+// MustMap returns as map from json object with optional default value
+// if error return default(if set) or panic
+func (j *Json) MustMap(args ...map[string]interface{}) map[string]interface{} {
+	if len(args) > 1 {
+		panic("Too many arguments")
+	}
+
+	r, err := j.Map()
+	if err == nil {
+		return r
+	}
+
+	if len(args) == 1 {
+		return args[0]
+	}
+
+	panic(err)
+}
+
+// MustArray returns as array from json object with optional default value
+// if error return default(if set) or panic
+func (j *Json) MustArray(args ...[]interface{}) []interface{} {
+	if len(args) > 1 {
+		panic("Too many arguments")
+	}
+
+	r, err := j.Array()
+	if err == nil {
+		return r
+	}
+
+	if len(args) == 1 {
+		return args[0]
+	}
+
+	panic(err)
 }
 
 // MustBool returns as bool from json object with optional default value

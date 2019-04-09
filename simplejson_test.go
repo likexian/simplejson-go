@@ -564,6 +564,16 @@ func Test_Get_Must_Assert_Data(t *testing.T) {
 	jsonData, err := Loads(textResult)
 	assert.Equal(t, err, nil)
 
+	// Get data as map
+	mapData := jsonData.Get("status").MustMap()
+	assert.Equal(t, "map[string]interface {}", fmt.Sprintf("%T", mapData))
+	assert.Equal(t, len(mapData), 2)
+
+	// Get data as array
+	arrayData := jsonData.Get("result").Get("intlist").MustArray()
+	assert.Equal(t, "[]interface {}", fmt.Sprintf("%T", arrayData))
+	assert.Equal(t, len(arrayData), 5)
+
 	// Get data as bool
 	boolData := jsonData.Get("result").Get("online").MustBool()
 	assert.Equal(t, "bool", fmt.Sprintf("%T", boolData))
@@ -605,6 +615,22 @@ func Test_Get_Must_Assert_Data_N_Default(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
 	assert.Equal(t, err, nil)
+
+	// Get data as map
+	testMustPanic(t, func() {
+		jsonData.Get("not-exists").MustMap()
+	})
+	testMustPanic(t, func() {
+		jsonData.Get("not-exists").MustMap(map[string]interface{}{}, map[string]interface{}{})
+	})
+
+	// Get data as array
+	testMustPanic(t, func() {
+		jsonData.Get("not-exists").MustArray()
+	})
+	testMustPanic(t, func() {
+		jsonData.Get("not-exists").MustArray([]interface{}{}, []interface{}{})
+	})
 
 	// Get data as bool
 	testMustPanic(t, func() {
@@ -667,6 +693,16 @@ func Test_Get_Must_Assert_Data_W_Default(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
 	assert.Equal(t, err, nil)
+
+	// Get data as map
+	mapData := jsonData.Get("not-exists").MustMap(map[string]interface{}{})
+	assert.Equal(t, "map[string]interface {}", fmt.Sprintf("%T", mapData))
+	assert.Equal(t, len(mapData), 0)
+
+	// Get data as array
+	arrayData := jsonData.Get("not-exists").MustArray([]interface{}{})
+	assert.Equal(t, "[]interface {}", fmt.Sprintf("%T", arrayData))
+	assert.Equal(t, len(arrayData), 0)
 
 	// Get data as bool
 	boolData := jsonData.Get("not-exists").MustBool(true)
