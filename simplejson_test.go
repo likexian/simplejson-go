@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"github.com/likexian/gokit/assert"
 	"os"
-	"runtime"
 	"testing"
 	"time"
 )
@@ -53,21 +52,6 @@ var (
 	jsonLink   = "https://www.likexian.com/"
 )
 
-func testMustPanic(t *testing.T, testFunc func()) {
-	defer func() {
-		err := recover()
-		if err == nil {
-			_, file, line, ok := runtime.Caller(2)
-			if ok {
-				t.Errorf("%s: %d", file, line)
-			}
-		}
-		assert.NotEqual(t, err, nil)
-	}()
-
-	testFunc()
-}
-
 func init() {
 	os.Remove(textFile)
 
@@ -85,32 +69,32 @@ func init() {
 }
 
 func TestVersion(t *testing.T) {
-	assert.NotEqual(t, Version(), "")
-	assert.NotEqual(t, Author(), "")
-	assert.NotEqual(t, License(), "")
+	assert.Contains(t, Version(), ".")
+	assert.Contains(t, Author(), "likexian")
+	assert.Contains(t, License(), "Apache License")
 }
 
 func Test_New(t *testing.T) {
 	// no init value to New
 	jsonData := New()
 	jsonText, err := jsonData.Dumps()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonText, `{}`)
 
 	// pass init value to New
 	jsonData = New(jsonResult)
 	jsonText, err = jsonData.Dumps()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonText, textResult)
 
 	// pass init map to New
 	jsonMap := map[string]interface{}{"i": map[string]interface{}{"am": "Li Kexian", "age": 18}}
 	jsonData = New(jsonMap)
 	jsonText, err = jsonData.Dumps()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonText, `{"i":{"age":18,"am":"Li Kexian"}}`)
 	name, err := jsonData.Get("i").Get("am").String()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, name, "Li Kexian")
 }
 
@@ -119,7 +103,7 @@ func Test_Load_Dump(t *testing.T) {
 
 	// Loads json from text
 	j, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	code, err := j.Get("status.code").Int()
 	assert.Nil(t, err)
 	assert.Equal(t, code, 1)
@@ -182,11 +166,11 @@ func Test_Set_Has_Get_Del(t *testing.T) {
 
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Test key exists
 	exists := jsonData.Has("name")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 
 	// Set key-value
 	jsonData.Set("name", jsonName)
@@ -194,35 +178,35 @@ func Test_Set_Has_Get_Del(t *testing.T) {
 
 	// Test dumpable
 	err = jsonData.Dump(textFile)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Test Set key-value
 	exists = jsonData.Has("name")
-	assert.Equal(t, exists, true)
+	assert.True(t, exists)
 
 	// Get the Set name value
 	rName, err := jsonData.Get("name").String()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonName, rName)
 
 	// Get the Set link value
 	rLink, err := jsonData.Get("link").String()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonLink, rLink)
 
 	// Get the not-exists key
 	_, err = jsonData.Get("not-exists").String()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 
 	// Del key-value
 	jsonData.Del("name")
 	exists = jsonData.Has("name")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 
 	// Del not-exists key
 	jsonData.Del("not-exists")
 	exists = jsonData.Has("not-exists")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 
 	// Del on Array
 	jsonData.Del("not-exists.name")
@@ -245,11 +229,11 @@ func Test_Set_Has_Get_Del_W_Dot(t *testing.T) {
 
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Test key exists
 	exists := jsonData.Has("i.am.that.who")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 
 	// Set key-value
 	jsonData.Set("i.am.that.who", jsonName)
@@ -258,47 +242,47 @@ func Test_Set_Has_Get_Del_W_Dot(t *testing.T) {
 
 	// Test dumpable
 	err = jsonData.Dump(textFile)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Test Set key-value
 	exists = jsonData.Has("i.am.that.who")
-	assert.Equal(t, exists, true)
+	assert.True(t, exists)
 
 	// Get the Set name value
 	rName, err := jsonData.Get("i.am.that.who").String()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonName, rName)
 
 	// Get the not exists key
 	_, err = jsonData.Get("i.am.that.what").String()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 	_, err = jsonData.Get("i.am.this.who").String()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 
 	// Get the Set name value with origin way
 	rName, err = jsonData.Get("i").Get("am").Get("that").Get("who").String()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonName, rName)
 
 	// Get the not exists key
 	_, err = jsonData.Get("i").Get("am").Get("that").Get("what").String()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 
 	// Del key-value
 	jsonData.Del("i.am.that.who")
 	exists = jsonData.Has("i.am.that.who")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 
 	// Del not-exists key
 	jsonData.Del("i.am.that.what")
 	exists = jsonData.Has("i.am.that.what")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 }
 
 func Test_Set_Has_Get_Del_W_List(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Test key exists
 	exists := jsonData.Has("that.is.a.list")
@@ -317,74 +301,74 @@ func Test_Set_Has_Get_Del_W_List(t *testing.T) {
 
 	// Test N key exists
 	exists = jsonData.Has("that.is.a.list.3")
-	assert.Equal(t, exists, true)
+	assert.True(t, exists)
 
 	// Test N key not exists
 	exists = jsonData.Has("that.is.a.list.666")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 
 	// Test set dict in list
 	jsonData.Set("that.is.a.dict.in.list", []interface{}{map[string]interface{}{"a": 1, "b": 2, "c": 3}})
 	exists = jsonData.Has("that.is.a.dict.in.list")
-	assert.Equal(t, exists, true)
+	assert.True(t, exists)
 
 	// Test dict in list exists
 	exists = jsonData.Has("that.is.a.dict.in.list.0")
-	assert.Equal(t, exists, true)
+	assert.True(t, exists)
 	exists = jsonData.Has("that.is.a.dict.in.list.0.a")
-	assert.Equal(t, exists, true)
+	assert.True(t, exists)
 	exists = jsonData.Has("that.is.a.dict.in.list.1.a")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 	exists = jsonData.Has("that.is.a.dict.in.list.0.z")
-	assert.Equal(t, exists, false)
+	assert.False(t, exists)
 
 	// Test get dict in list
 	intData, err := jsonData.Get("that.is.a.dict.in.list.0.b").Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, intData, 2)
 	_, err = jsonData.Get("that.is.a.dict.in.list.1.b").Int()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 	_, err = jsonData.Get("that.is.a.dict.in.list.0.z").Int()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 
 	// Get the list value
 	rNumber, err := jsonData.Get("that.is.a.list.3").Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, rNumber, 3)
 
 	// Get not-exists N
 	_, err = jsonData.Get("that.is.a.list.666").Int()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 
 	// Get the list value with origin way
 	rNumber, err = jsonData.Get("that").Get("is").Get("a").Get("list").Get("4").Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, rNumber, 4)
 
 	// Get the list value with Index
 	rNumber, err = jsonData.Get("that.is.a.list").Index(1).Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, rNumber, 1)
 
 	// Get the list value with origin way Index
 	rNumber, err = jsonData.Get("that").Get("is").Get("a").Get("list").Index(2).Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, rNumber, 2)
 
 	// Get not-exists N with origin way Index
 	_, err = jsonData.Get("that").Get("is").Get("a").Get("list").Index(666).Int()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 }
 
 func Test_Set_Has_Get_Del_Type(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Set bool value
 	jsonData.Set("bool", true)
 	boolData, err := jsonData.Get("bool").Bool()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, boolData, true)
 	assert.Equal(t, "bool", fmt.Sprintf("%T", boolData))
 	assert.Equal(t, jsonData.Has("bool"), true)
@@ -394,7 +378,7 @@ func Test_Set_Has_Get_Del_Type(t *testing.T) {
 	// Set string value
 	jsonData.Set("string", "string")
 	stringData, err := jsonData.Get("string").String()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, stringData, "string")
 	assert.Equal(t, "string", fmt.Sprintf("%T", stringData))
 	assert.Equal(t, jsonData.Has("string"), true)
@@ -404,7 +388,7 @@ func Test_Set_Has_Get_Del_Type(t *testing.T) {
 	// Set float64 value
 	jsonData.Set("float64", float64(999))
 	float64Data, err := jsonData.Get("float64").Float64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, float64Data, float64(999))
 	assert.Equal(t, "float64", fmt.Sprintf("%T", float64Data))
 	assert.Equal(t, jsonData.Has("float64"), true)
@@ -413,18 +397,18 @@ func Test_Set_Has_Get_Del_Type(t *testing.T) {
 
 	jsonData.Set("float64", int(999))
 	float64Data, err = jsonData.Get("float64").Float64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, float64Data, float64(999))
 
 	jsonData.Set("float64", uint(999))
 	float64Data, err = jsonData.Get("float64").Float64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, float64Data, float64(999))
 
 	// Set int value
 	jsonData.Set("int", int(666))
 	intData, err := jsonData.Get("int").Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, intData, int(666))
 	assert.Equal(t, "int", fmt.Sprintf("%T", intData))
 	assert.Equal(t, jsonData.Has("int"), true)
@@ -433,18 +417,18 @@ func Test_Set_Has_Get_Del_Type(t *testing.T) {
 
 	jsonData.Set("int", float64(666))
 	intData, err = jsonData.Get("int").Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, intData, int(666))
 
 	jsonData.Set("int", uint(666))
 	intData, err = jsonData.Get("int").Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, intData, int(666))
 
 	// Set int64 value
 	jsonData.Set("int64", int64(666))
 	int64Data, err := jsonData.Get("int64").Int64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, int64Data, int64(666))
 	assert.Equal(t, "int64", fmt.Sprintf("%T", int64Data))
 	assert.Equal(t, jsonData.Has("int64"), true)
@@ -453,18 +437,18 @@ func Test_Set_Has_Get_Del_Type(t *testing.T) {
 
 	jsonData.Set("int64", float64(666))
 	int64Data, err = jsonData.Get("int64").Int64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, int64Data, int64(666))
 
 	jsonData.Set("int64", uint(666))
 	int64Data, err = jsonData.Get("int64").Int64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, int64Data, int64(666))
 
 	// Set uint64 value
 	jsonData.Set("uint64", uint64(666))
 	uint64Data, err := jsonData.Get("uint64").Uint64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, uint64Data, uint64(666))
 	assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64Data))
 	assert.Equal(t, jsonData.Has("uint64"), true)
@@ -473,18 +457,18 @@ func Test_Set_Has_Get_Del_Type(t *testing.T) {
 
 	jsonData.Set("uint64", float64(666))
 	uint64Data, err = jsonData.Get("uint64").Uint64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, uint64Data, uint64(666))
 
 	jsonData.Set("uint64", int(666))
 	uint64Data, err = jsonData.Get("uint64").Uint64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, uint64Data, uint64(666))
 
 	// Set string array value
 	jsonData.Set("string_array", []interface{}{"a", "b", "c"})
 	stringArrayData, err := jsonData.Get("string_array").StringArray()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, stringArrayData, []string{"a", "b", "c"})
 	assert.Equal(t, "[]string", fmt.Sprintf("%T", stringArrayData))
 	assert.Equal(t, jsonData.Has("string_array"), true)
@@ -495,16 +479,16 @@ func Test_Set_Has_Get_Del_Type(t *testing.T) {
 func Test_Get_Assert_Data(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Get data as map
 	mapData, err := jsonData.Get("status").Map()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "map[string]interface {}", fmt.Sprintf("%T", mapData))
 
 	// Get data as array
 	ArrayData, err := jsonData.Get("result").Get("intlist").Array()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "[]interface {}", fmt.Sprintf("%T", ArrayData))
 	for k, v := range ArrayData {
 		r, _ := v.(json.Number).Int64()
@@ -513,44 +497,44 @@ func Test_Get_Assert_Data(t *testing.T) {
 
 	// Get data as bool
 	boolData, err := jsonData.Get("result").Get("online").Bool()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "bool", fmt.Sprintf("%T", boolData))
 	assert.Equal(t, boolData, true)
 
 	// Get data as string
 	stringData, err := jsonData.Get("status").Get("message").String()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "string", fmt.Sprintf("%T", stringData))
 	assert.Equal(t, stringData, "success")
 
 	// Get data as float64
 	float64Data, err := jsonData.Get("result").Get("rate").Float64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "float64", fmt.Sprintf("%T", float64Data))
 	assert.Equal(t, float64Data, float64(0.8))
 
 	// Get data as int
 	intData, err := jsonData.Get("status").Get("code").Int()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "int", fmt.Sprintf("%T", intData))
 	assert.Equal(t, intData, int(1))
 
 	// Get data as int64
 	int64Data, err := jsonData.Get("status").Get("code").Int64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "int64", fmt.Sprintf("%T", int64Data))
 	assert.Equal(t, int64Data, int64(1))
 
 	// Get data as uint64
 	uint64Data, err := jsonData.Get("status").Get("code").Uint64()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "uint64", fmt.Sprintf("%T", uint64Data))
 	assert.Equal(t, uint64Data, uint64(1))
 
 	// Get data as string array
 	jsonData.Set("that.is.a.list", []interface{}{"a", "b", "c", "d", "e", nil})
 	stringArrayData, err := jsonData.Get("that.is.a.list").StringArray()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, "[]string", fmt.Sprintf("%T", stringArrayData))
 	assert.Equal(t, stringArrayData, []string{"a", "b", "c", "d", "e", ""})
 
@@ -562,7 +546,7 @@ func Test_Get_Assert_Data(t *testing.T) {
 func Test_Get_Must_Assert_Data(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Get data as map
 	mapData := jsonData.Get("status").MustMap()
@@ -614,77 +598,77 @@ func Test_Get_Must_Assert_Data(t *testing.T) {
 func Test_Get_Must_Assert_Data_N_Default(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Get data as map
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustMap()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustMap(map[string]interface{}{}, map[string]interface{}{})
 	})
 
 	// Get data as array
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustArray()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustArray([]interface{}{}, []interface{}{})
 	})
 
 	// Get data as bool
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustBool()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustBool(false, false)
 	})
 
 	// Get data as string
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustString()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustString("", "")
 	})
 
 	// Get data as float64
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustFloat64()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustFloat64(0, 0)
 	})
 
 	// Get data as int
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustInt()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustInt(0, 0)
 	})
 
 	// Get data as int64
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustInt64()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustInt64(0, 0)
 	})
 
 	// Get data as uint64
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustUint64()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustUint64(0, 0)
 	})
 
 	// Get data as string array
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustStringArray()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustStringArray([]string{}, []string{})
 	})
 }
@@ -692,7 +676,7 @@ func Test_Get_Must_Assert_Data_N_Default(t *testing.T) {
 func Test_Get_Must_Assert_Data_W_Default(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Get data as map
 	mapData := jsonData.Get("not-exists").MustMap(map[string]interface{}{})
@@ -748,80 +732,80 @@ func Test_HTML_Escape(t *testing.T) {
 
 	// dumps not escaped html
 	jsonText, err := jsonData.Dumps()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonText, `{"param":"a=1&b=2&c=3","title":"<title>test escape</title>"}`)
 
 	// dumps escaped html
 	jsonData.SetHtmlEscape(true)
 	jsonText, err = jsonData.Dumps()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, jsonText, `{"param":"a=1\u0026b=2\u0026c=3","title":"\u003ctitle\u003etest escape\u003c/title\u003e"}`)
 }
 
 func Test_isMap(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Test the top level json
 	isMap := jsonData.IsMap()
-	assert.Equal(t, isMap, true)
+	assert.True(t, isMap)
 
 	// Test after get
 	isMap = jsonData.Get("status").IsMap()
-	assert.Equal(t, isMap, true)
+	assert.True(t, isMap)
 
 	// Test after twice get
 	isMap = jsonData.Get("result").Get("online").IsMap()
-	assert.Equal(t, isMap, false)
+	assert.False(t, isMap)
 
 	// Test after magic get
 	isMap = jsonData.Get("result.online").IsMap()
-	assert.Equal(t, isMap, false)
+	assert.False(t, isMap)
 
 	// Test the array
 	isMap = jsonData.Get("result.intlist").IsMap()
-	assert.Equal(t, isMap, false)
+	assert.False(t, isMap)
 
 	// Test not exists key
 	isMap = jsonData.Get("result.not-exists").IsMap()
-	assert.Equal(t, isMap, false)
+	assert.False(t, isMap)
 }
 
 func Test_Is_Array(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Test the top level json
 	isMap := jsonData.IsArray()
-	assert.Equal(t, isMap, false)
+	assert.False(t, isMap)
 
 	// Test after get
 	isMap = jsonData.Get("status").IsArray()
-	assert.Equal(t, isMap, false)
+	assert.False(t, isMap)
 
 	// Test after twice get
 	isMap = jsonData.Get("result").Get("intlist").IsArray()
-	assert.Equal(t, isMap, true)
+	assert.True(t, isMap)
 
 	// Test the array
 	isMap = jsonData.Get("result.intlist").IsArray()
-	assert.Equal(t, isMap, true)
+	assert.True(t, isMap)
 
 	// Test the array element
 	isMap = jsonData.Get("result.intlist.0").IsArray()
-	assert.Equal(t, isMap, false)
+	assert.False(t, isMap)
 
 	// Test not exists key
 	isMap = jsonData.Get("result.not-exists").IsArray()
-	assert.Equal(t, isMap, false)
+	assert.False(t, isMap)
 }
 
 func Test_Len(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Get len of top level json
 	n := jsonData.Len()
@@ -859,64 +843,64 @@ func Test_Len(t *testing.T) {
 func Test_Time_Assert_Data(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Time for comparing
 	testTime, err := time.Parse(time.RFC3339, "2019-01-31T12:11:10+08:00")
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.NotEqual(t, testTime.Unix(), int64(0))
 
 	// Test get rfc3339 time
 	jsonData.Set("time", "2019-01-31T12:11:10+08:00")
 	timeData, err := jsonData.Get("time").Time()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Test get format time
 	jsonData.Set("time", "2019-01-31 12:11:10")
 	timeData, err = jsonData.Get("time").Time("2006-01-02 15:04:05")
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.NotEqual(t, timeData.Unix(), int64(0))
 
 	// Test get rfc3339 time with not exists key
 	timeData, err = jsonData.Get("not-exists").Time()
-	assert.NotEqual(t, err, nil)
+	assert.NotNil(t, err)
 	assert.Equal(t, timeData.Unix(), int64(-62135596800))
 
 	// Test get time from int
 	testTime = time.Unix(1548907870, 0)
 	jsonData.Set("time", int(1548907870))
 	timeData, err = jsonData.Get("time").Time()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Test get time from int64
 	jsonData.Set("time", int64(1548907870))
 	timeData, err = jsonData.Get("time").Time()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Test get time from uint64
 	jsonData.Set("time", uint64(1548907870))
 	timeData, err = jsonData.Get("time").Time()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Test get time from float64
 	jsonData.Set("time", float64(1548907870))
 	timeData, err = jsonData.Get("time").Time()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Date for comparing
 	testTime, err = time.ParseInLocation("2006-01-02", "2019-01-31", time.Local)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.NotEqual(t, testTime.Unix(), int64(0))
 
 	// Test get format date
 	jsonData.Set("time", "2019-01-31")
 	timeData, err = jsonData.Get("time").Time("2006-01-02")
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Invalid args
@@ -930,77 +914,77 @@ func Test_Time_Assert_Data(t *testing.T) {
 func Test_Time_Must_Assert_Data(t *testing.T) {
 	// Loads json for Set
 	jsonData, err := Loads(textResult)
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 
 	// Time for comparing
 	testTime, err := time.Parse(time.RFC3339, "2019-01-31T12:11:10+08:00")
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.NotEqual(t, testTime.Unix(), int64(0))
 
 	// Test get rfc3339 time
 	jsonData.Set("time", "2019-01-31T12:11:10+08:00")
 	timeData := jsonData.Get("time").MustTime()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Test get format time
 	jsonData.Set("time", "2019-01-31 12:11:10")
 	timeData = jsonData.Get("time").MustTime("2006-01-02 15:04:05")
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.NotEqual(t, timeData.Unix(), int64(0))
 
 	// No format, no default
 	jsonData.Set("time", "i-am-not-the-time")
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("time").MustTime()
 	})
 
 	// Has format, no default
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("time").MustTime("2006-01-02 15:04:05")
 	})
 
 	// No format, has default
 	testTime = time.Unix(1548907870, 0)
 	timeData = jsonData.Get("time").MustTime(time.Unix(1548907870, 0))
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Has format, has default
 	timeData = jsonData.Get("time").MustTime("2006-01-02 15:04:05", time.Unix(1548907870, 0))
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// No format, no default, key not exists
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustTime()
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustTime(1)
 	})
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("not-exists").MustTime(1, 1, 1)
 	})
 
 	// No format, has default, key not exists
 	timeData = jsonData.Get("not-exists").MustTime(time.Unix(1548907870, 0))
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Test must get time from int
 	jsonData.Set("time", int(1548907870))
 	timeData = jsonData.Get("time").MustTime()
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 
 	// Get from int, No default
 	jsonData.Set("time", true)
-	testMustPanic(t, func() {
+	assert.Panic(t, func() {
 		jsonData.Get("time").MustTime()
 	})
 
 	// Get from int, Has default
 	timeData = jsonData.Get("time").MustTime(time.Unix(1548907870, 0))
-	assert.Equal(t, err, nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timeData, testTime)
 }

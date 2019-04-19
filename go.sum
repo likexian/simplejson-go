@@ -1,2 +1,5 @@
 github.com/likexian/gokit v0.0.0-20190309162924-0a377eecf7aa h1:GtXUaQL+mitt6BMmw9fJMfWzAzsI3lHaRxOpk/iVJL0=
 github.com/likexian/gokit v0.0.0-20190309162924-0a377eecf7aa/go.mod h1:QdfYv6y6qPA9pbBA2qXtoT8BMKha6UyNbxWGWl/9Jfk=
+github.com/likexian/gokit v0.0.0-20190418170008-ace88ad0983b h1:Bi9sULkAWMQGNX4S0MIpuJ8/Kjc4YmD4G0LpuNy1Hyc=
+github.com/likexian/gokit v0.0.0-20190418170008-ace88ad0983b/go.mod h1:KKqSnk/VVSW8kEyO2vVCXoanzEutKdlBAPohmGXkxCk=
+github.com/likexian/simplejson-go v0.0.0-20190409170913-40473a74d76d/go.mod h1:Typ1BfnATYtZ/+/shXfFYLrovhFyuKvzwrdOnIDHlmg=
