@@ -1,3 +1,5 @@
 module github.com/likexian/simplejson-go
 
-require github.com/likexian/gokit v0.0.0-20190418170008-ace88ad0983b
+go 1.12
+
+require github.com/likexian/gokit v0.0.0-20190501133040-e77ea8b19cdc

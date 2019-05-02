@@ -12,6 +12,14 @@ simplejson-go is a simple and powerful Go module for JSON parsing.
 
 This module provides the most friendly way to use JSON in golang.
 
+## Features
+
+- Easy load to json and dump to string
+- Load and dump with file is supported
+- Modify the json data is simple
+- One line retrieval with MustXXX
+- Get by dot notation key is supported
+
 ## Installation
 
     go get -u github.com/likexian/simplejson-go
