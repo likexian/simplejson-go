@@ -23,11 +23,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/likexian/gokit/xfile"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/likexian/gokit/xfile"
 )
 
 // Json storing json data
@@ -38,7 +39,7 @@ type Json struct {
 
 // Version returns package version
 func Version() string {
-	return "0.12.0"
+	return "0.12.1"
 }
 
 // Author returns package author

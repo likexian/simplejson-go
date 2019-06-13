@@ -22,10 +22,11 @@ package simplejson
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/likexian/gokit/assert"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/likexian/gokit/assert"
 )
 
 type JsonResult struct {
